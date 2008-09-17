@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+
+require 'flay'
+
+flay = Flay.new
+flay.process(*ARGV)
+flay.report

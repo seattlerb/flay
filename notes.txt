@@ -1,0 +1,38 @@
+# # 1. Build the list structures describing sequences
+# # 2. For k = MinimumSequenceLengthThreshold
+# #      to MaximumSequenceLength
+# # 3. Place all subsequences of length k
+# # into buckets according to subsequence hash
+# # 4. For each subsequence i and j in same bucket
+# # If CompareSequences (i,j,k) >
+# #           SimilarityThreshold
+# # Then { RemoveSequenceSubclonesOf(clones,i,j,k)
+# #        AddSequenceClonePair(Clones,i,j,k)
+# #      }
+
+# # TODO: process this as the same
+# #  save(get(x * 3) - (x + 6) - 4);
+# # print(get(x * 3) - (x * 5) + 4);
+
+# # Figure 1 - Basic Subtree Clone Detection Algorithm   x=0;
+
+# # 1. Clones=[]
+# # 2. For each subtree i:
+# # If mass(i)>=MassThreshold
+# # Then hash i to bucket
+# # 3. For each subtree i and j in the same bucket
+# # If CompareTree(i,j) > SimilarityThreshold
+# # Then { For each subtree s of i
+# #   If IsMember(Clones,s)
+# #   Then RemoveClonePair(Clones,s)
+# # For each subtree s of j
+# #   If IsMember(Clones,s)
+# #   Then RemoveClonePair(Clones,s)
+# # AddClonePair(Clones,i,j)
+# #      }
+
+# # Similarity = 2 x S /  (2 x S + L + R)
+# # where:
+# # S = number of shared nodes
+# # L = number of different nodes in sub-tree 1
+# # R = number of different nodes in sub-tree 2
