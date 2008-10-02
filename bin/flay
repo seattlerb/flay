@@ -1,7 +1,9 @@
-#!/usr/bin/env ruby
+#!/usr/bin/ruby -s
+
+$m ||= nil
 
 require 'flay'
 
-flay = Flay.new
+flay = Flay.new($m.to_i)
 flay.process(*ARGV)
 flay.report
