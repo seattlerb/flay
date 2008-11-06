@@ -58,12 +58,18 @@ class Flay
   def report prune = nil
     self.prune
 
-    self.hashes.each do |_,nodes|
+    self.hashes.sort_by { |_,nodes|
+      -(nodes.first.mass * nodes.size)
+    }.each do |_,nodes|
       next unless nodes.first.first == prune if prune
       puts
-      puts "Matches found in: #{nodes.first.first}"
+
+      node = nodes.first
+      puts "Matches found in %p (mass = %d)" %
+        [node.first, nodes.size * node.mass]
+
       nodes.each do |node|
-        puts "  #{node.file}:#{node.line} (mass = #{node.mass})"
+        puts "  #{node.file}:#{node.line}"
       end
     end
   end
