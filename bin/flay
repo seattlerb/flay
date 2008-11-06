@@ -1,6 +1,6 @@
 #!/usr/bin/ruby -s
 
-$m ||= nil
+$m ||= 16
 
 require 'flay'
 
