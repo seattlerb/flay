@@ -1,32 +1,59 @@
 = flay
 
-* FIX (url)
+* http://ruby.sadi.st/
+* http://rubyforge.org/projects/seattlerb
 
 == DESCRIPTION:
 
-FIX (describe your package)
+Flay analyzes ruby code for structural similarities. Differences in
+literal values, variable, class, method names, whitespace, programming
+style, braces vs do/end, etc are all ignored. Making this totally rad.
 
 == FEATURES/PROBLEMS:
 
-* FIX (list of features or problems)
+* Differences in literal values, variable, class, and method names are ignored.
+* Differences in whitespace, programming style, braces vs do/end, etc are ignored.
+* Works across files.
+* Reports differences at any level of code.
+
+== TODO:
+
+* Editor integration (emacs, textmate, other contributions welcome).
+* N-way diff reporting... or... something. Not sure.
+* UI improvement suggestions welcome. :)
 
 == SYNOPSIS:
 
-  FIX (code sample of usage)
+  % flay lib/*.rb
+  Processing unit/itemconfig.rb...
+  
+  Matches found in :when (mass = 572)
+    unit/itemconfig.rb:343
+    unit/itemconfig.rb:379
+    unit/itemconfig.rb:706
+    unit/itemconfig.rb:742
+  
+  Matches found in :when (mass = 500)
+    unit/itemconfig.rb:509
+    unit/itemconfig.rb:539
+    unit/itemconfig.rb:875
+    unit/itemconfig.rb:905
+  ...
 
 == REQUIREMENTS:
 
-* FIX (list of requirements)
+* ruby_parser
+* sexp_processor
 
 == INSTALL:
 
-* FIX (sudo gem install, anything else)
+* sudo gem install flay
 
 == LICENSE:
 
 (The MIT License)
 
-Copyright (c) 2008 FIX
+Copyright (c) 2008 Ryan Davis, Seattle.rb
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
