@@ -13,7 +13,7 @@ if $v then
 end
 
 class Flay
-  VERSION = '1.0.0'
+  VERSION = '1.1.0'
 
   attr_reader :hashes
 
@@ -87,15 +87,26 @@ class Flay
   def report prune = nil
     self.prune
 
-    self.hashes.sort_by { |_,nodes|
-      -(nodes.first.mass * nodes.size)
-    }.each do |_,nodes|
+    identical = {}
+    masses = {}
+
+    self.hashes.each do |hash,nodes|
+      identical[hash] = nodes[1..-1].all? { |n| n == nodes.first }
+      masses[hash] = nodes.first.mass * nodes.size
+      masses[hash] *= (nodes.size) if identical[hash]
+    end
+
+    masses.sort_by { |_,mass| -mass }.each do |hash,mass|
+      nodes = hashes[hash]
       next unless nodes.first.first == prune if prune
       puts
 
+      same = identical[hash]
       node = nodes.first
-      puts "Matches found in %p (mass = %d)" %
-        [node.first, nodes.size * node.mass]
+      n = nodes.size
+
+      puts "%sMatches found in %p (mass%s = %d)" %
+        [same ? "IDENTICAL " : "", node.first, same ? "*#{n}" : "", mass]
 
       nodes.each_with_index do |node, i|
         if $v then

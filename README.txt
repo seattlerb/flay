@@ -15,31 +15,53 @@ style, braces vs do/end, etc are all ignored. Making this totally rad.
 * Differences in whitespace, programming style, braces vs do/end, etc are ignored.
 * Works across files.
 * Reports differences at any level of code.
+* Adds a score multiplier to identical nodes.
 * Run verbose to see an N-way diff of the code.
 
 == TODO:
 
 * Editor integration (emacs, textmate, other contributions welcome).
-* N-way diff reporting... or... something. Not sure.
 * UI improvement suggestions welcome. :)
 * Score sequence fragments (a;b;c;d;e) vs (b;c;d) etc.
 
 == SYNOPSIS:
 
-  % flay lib/*.rb
-  Processing unit/itemconfig.rb...
+  % flay -v ~/Work/svn/ruby/ruby_1_8/lib/cgi.rb
+  Processing /Users/ryan/Work/svn/ruby/ruby_1_8/lib/cgi.rb...
   
-  Matches found in :when (mass = 572)
-    unit/itemconfig.rb:343
-    unit/itemconfig.rb:379
-    unit/itemconfig.rb:706
-    unit/itemconfig.rb:742
+  Matches found in :defn (mass = 184)
+    A: /Users/ryan/Work/svn/ruby/ruby_1_8/lib/cgi.rb:1470
+    B: /Users/ryan/Work/svn/ruby/ruby_1_8/lib/cgi.rb:1925
   
-  Matches found in :when (mass = 500)
-    unit/itemconfig.rb:509
-    unit/itemconfig.rb:539
-    unit/itemconfig.rb:875
-    unit/itemconfig.rb:905
+  A: def checkbox_group(name = "", *values)
+  B: def radio_group(name = "", *values)
+       if name.kind_of?(Hash) then
+         values = name["VALUES"]
+         name = name["NAME"]
+       end
+       values.collect do |value|
+         if value.kind_of?(String) then
+  A:       (checkbox(name, value) + value)
+  B:       (radio_button(name, value) + value)
+         else
+           if (value[(value.size - 1)] == true) then
+  A:         (checkbox(name, value[0], true) + value[(value.size - 2)])
+  B:         (radio_button(name, value[0], true) + value[(value.size - 2)])
+           else
+  A:         (checkbox(name, value[0]) + value[(value.size - 1)])
+  B:         (radio_button(name, value[0]) + value[(value.size - 1)])
+           end
+         end
+       end.to_s
+     end
+  
+  IDENTICAL Matches found in :for (mass*2 = 144)
+    A: /Users/ryan/Work/svn/ruby/ruby_1_8/lib/cgi.rb:2160
+    B: /Users/ryan/Work/svn/ruby/ruby_1_8/lib/cgi.rb:2217
+  
+     for element in ["HTML", "BODY", "P", "DT", "DD", "LI", "OPTION", "THEAD", "TFOOT", "TBODY", "COLGROUP", "TR", "TH", "TD", "HEAD"] do
+       methods = (methods + (("          def #{element.downcase}(attributes = {})\n" + nO_element_def(element)) + "          end\n"))
+     end
   ...
 
 == REQUIREMENTS:

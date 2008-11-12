@@ -3,6 +3,7 @@
 * N minor enhancement:
 
   * Added -v verbose mode to print out N-way diff of the detected code.
+  * Added identical node scoring and reporting.
 
 === 1.0.0 / 2008-11-06
 
