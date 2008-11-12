@@ -1,6 +1,7 @@
 #!/usr/bin/ruby -s
 
 $m ||= 16
+$v ||= false
 
 require 'flay'
 

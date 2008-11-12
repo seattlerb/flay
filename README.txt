@@ -15,12 +15,14 @@ style, braces vs do/end, etc are all ignored. Making this totally rad.
 * Differences in whitespace, programming style, braces vs do/end, etc are ignored.
 * Works across files.
 * Reports differences at any level of code.
+* Run verbose to see an N-way diff of the code.
 
 == TODO:
 
 * Editor integration (emacs, textmate, other contributions welcome).
 * N-way diff reporting... or... something. Not sure.
 * UI improvement suggestions welcome. :)
+* Score sequence fragments (a;b;c;d;e) vs (b;c;d) etc.
 
 == SYNOPSIS:
 

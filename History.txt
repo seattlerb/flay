@@ -1,3 +1,9 @@
+=== 1.1.0 / 2008-11-??
+
+* N minor enhancement:
+
+  * Added -v verbose mode to print out N-way diff of the detected code.
+
 === 1.0.0 / 2008-11-06
 
 * 1 major enhancement
