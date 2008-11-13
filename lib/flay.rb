@@ -24,7 +24,7 @@ class Flay
 
   def process(*files)
     files.each do |file|
-      warn "Processing #{file}..."
+      warn "Processing #{file}"
 
       t = Time.now
       pt = RubyParser.new.process(File.read(file), file)
@@ -64,18 +64,23 @@ class Flay
       c = (?A + i).chr
       s.group = c
     end
+
+    max = data.map { |s| s.scan(/^.*/).size }.max
+
     data.map! { |s| # FIX: this is tarded, but I'm out of brain
       c = s.group
-      s = s.split(/\n/)
+      s = s.scan(/^.*/)
+      s.push(*(["\n"] * (max - s.size))) # pad
       s.each do |o|
         o.group = c
       end
       s
     }
 
-    groups = data[0].zip(*data[1..-1]).map { |lines| lines.uniq }
+    groups = data[0].zip(*data[1..-1])
     groups.map! { |lines|
-      if lines.size == 1 then
+      collapsed = lines.uniq
+      if collapsed.size == 1 then
         "   #{lines.first}"
       else
         lines.map { |l| "#{l.group}: #{l}" }
