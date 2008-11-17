@@ -26,18 +26,19 @@ class Flay
     files.each do |file|
       warn "Processing #{file}"
 
-      t = Time.now
       pt = RubyParser.new.process(File.read(file), file)
-
       next unless pt # empty files... hahaha, suck.
 
-      t = Time.now
-      pt.deep_each do |node|
-        next unless node.any? { |sub| Sexp === sub }
-        next if node.mass < @mass_threshold
+      process_sexp pt
+    end
+  end
 
-        self.hashes[node.fuzzy_hash] << node
-      end
+  def process_sexp pt
+    pt.deep_each do |node|
+      next unless node.any? { |sub| Sexp === sub }
+      next if node.mass < @mass_threshold
+
+      self.hashes[node.fuzzy_hash] << node
     end
   end
 
@@ -70,7 +71,7 @@ class Flay
     data.map! { |s| # FIX: this is tarded, but I'm out of brain
       c = s.group
       s = s.scan(/^.*/)
-      s.push(*(["\n"] * (max - s.size))) # pad
+      s.push(*([""] * (max - s.size))) # pad
       s.each do |o|
         o.group = c
       end
@@ -83,7 +84,8 @@ class Flay
       if collapsed.size == 1 then
         "   #{lines.first}"
       else
-        lines.map { |l| "#{l.group}: #{l}" }
+        # TODO: make r2r have a canonical mode (doesn't make 1-liners)
+        lines.reject { |l| l.empty? }.map { |l| "#{l.group}: #{l}" }
       end
     }
     groups.flatten.join("\n")
@@ -101,7 +103,7 @@ class Flay
       masses[hash] *= (nodes.size) if identical[hash]
     end
 
-    masses.sort_by { |_,mass| -mass }.each do |hash,mass|
+    masses.sort_by { |h,m| [-m, hashes[h].first.file] }.each do |hash,mass|
       nodes = hashes[hash]
       next unless nodes.first.first == prune if prune
       puts
@@ -109,9 +111,14 @@ class Flay
       same = identical[hash]
       node = nodes.first
       n = nodes.size
+      match, bonus = if same then
+                       ["IDENTICAL", "*#{n}"]
+                     else
+                       ["Similar",   ""]
+                     end
 
-      puts "%sMatches found in %p (mass%s = %d)" %
-        [same ? "IDENTICAL " : "", node.first, same ? "*#{n}" : "", mass]
+      puts "%s code found in %p (mass%s = %d)" %
+        [match, node.first, bonus, mass]
 
       nodes.each_with_index do |node, i|
         if $v then
@@ -133,12 +140,6 @@ end
 
 class String
   attr_accessor :group
-end
-
-class Symbol
-  def hash
-    @hash ||= self.to_s.hash
-  end
 end
 
 class Sexp
@@ -203,42 +204,4 @@ class Sexp
       yield sexp
     end
   end
-
-#   alias :old_inspect :inspect
-#   def inspect
-#     old_inspect.sub(/\)\Z/, ":h_#{self.fuzzy_hash})")
-#   end
-
-  alias :shut_up! :pretty_print
-  def pretty_print(q) # shows the hash TODO: remove
-    q.group(1, 'S(', ')') do
-      q.seplist(self + [":h_#{self.fuzzy_hash}"]) {|v| q.pp v }
-    end
-  end
 end
-
-#   def n_way_diff a, *others
-#     r = []
-
-#     Tempfile.open("a") do |ta|
-#       ta.write a
-#       ta.flush
-#       pa = ta.path
-
-#       others.each_with_index do |b, i|
-#         c = (?B + i).chr
-#         Tempfile.open("b") do |tb|
-#           tb.write b
-#           tb.flush
-#           pb = tb.path
-#           r<<`diff --old-line-format="A: %L" --new-line-format="#{c}: %L" #{pa} #{pb}`
-# #           diff = `diff -U999 #{pa} #{pb}`
-# #           r << diff.gsub(/^[^-+]/, '   ').gsub(/^-/, 'A: ').gsub(/^\+/, "#{c}: ")
-#         end
-#       end
-#     end
-
-#     r.map! { |s| s.split(/\n/)[0..-1] }
-#     r[0].zip(*r[1..-1]).map { |lines| lines.uniq }.flatten.join("\n")
-#   end
-
