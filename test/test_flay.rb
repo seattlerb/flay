@@ -47,7 +47,7 @@ class SexpTest < Test::Unit::TestCase
           s(:lasgn, :c),
           s(:call, nil, :d, s(:arglist)))
 
-    hash = 955256285
+    hash = 992252
 
     assert_equal hash, s.fuzzy_hash,             "hand copy"
     assert_equal hash, @s.fuzzy_hash,            "ivar from setup"
@@ -56,8 +56,7 @@ class SexpTest < Test::Unit::TestCase
   end
 
   def test_all_subhashes
-    expected = [-704571402, -282578980, -35395725,
-                160138040, 815971090, 927228382]
+    expected = [187948, 214336, 214416, 214496, 283760, 380700]
 
     assert_equal expected, @s.all_subhashes.sort.uniq
     assert ! @s.all_subhashes.include?(@s.fuzzy_hash)
