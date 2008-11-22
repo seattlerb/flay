@@ -1,9 +1,10 @@
-=== 1.1.0 / 2008-11-??
+=== 1.1.0 / 2008-11-21
 
-* N minor enhancement:
+* 3 minor enhancement:
 
   * Added -v verbose mode to print out N-way diff of the detected code.
   * Added identical node scoring and reporting.
+  * Added the start of copy/paste+edit detection, not even close yet
 
 === 1.0.0 / 2008-11-06
 

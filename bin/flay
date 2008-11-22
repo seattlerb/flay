@@ -1,8 +1,5 @@
 #!/usr/bin/ruby -s
 
-$m ||= 16
-$v ||= false
-
 require 'flay'
 
 flay = Flay.new($m.to_i)

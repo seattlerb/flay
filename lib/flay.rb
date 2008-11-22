@@ -5,6 +5,11 @@ $: << "../../ruby_parser/dev/lib"
 require 'rubygems'
 require 'sexp_processor'
 require 'ruby_parser'
+require 'pp' # TODO: remove
+
+$m ||= 16
+$v ||= false
+$f ||= false
 
 if $v then
   $: << "../../ruby2ruby/dev/lib"
@@ -15,6 +20,7 @@ end
 class Flay
   VERSION = '1.1.0'
 
+  attr_accessor :mass_threshold
   attr_reader :hashes
 
   def initialize(mass = 16)
@@ -31,14 +37,52 @@ class Flay
 
       process_sexp pt
     end
+
+    process_fuzzy_similarities if $f
   end
 
   def process_sexp pt
     pt.deep_each do |node|
       next unless node.any? { |sub| Sexp === sub }
-      next if node.mass < @mass_threshold
+      next if node.mass < self.mass_threshold
 
       self.hashes[node.fuzzy_hash] << node
+    end
+  end
+
+  def process_fuzzy_similarities
+    all_hashes, detected = {}, {}
+
+    self.hashes.values.each do |nodes|
+      nodes.each do |node|
+        next if node.mass > 4 * self.mass_threshold
+        # TODO: try out with fuzzy_hash
+        # all_hashes[node] = node.grep(Sexp).map { |s| [s.hash] * s.mass }.flatten
+        all_hashes[node] = node.grep(Sexp).map { |s| [s.hash] }.flatten
+      end
+    end
+
+    # warn "looking for copy/paste/edit code across #{all_hashes.size} nodes"
+
+    all_hashes = all_hashes.to_a
+    all_hashes.each_with_index do |(s1, h1), i|
+      similar = [s1]
+      all_hashes[i+1..-1].each do |(s2, h2)|
+        next if detected[h2]
+        intersection = h1.intersection h2
+        max = [h1.size, h2.size].max
+        if intersection.size >= max * 0.60 then
+          similarity = s1.similarity(s2)
+          if similarity > 0.60 then
+            similar << s2
+            detected[h2] = true
+          else
+            p [similarity, s1, s2]
+          end
+        end
+      end
+
+      self.hashes[similar.first.hash].push(*similar) if similar.size > 1
     end
   end
 
@@ -103,6 +147,7 @@ class Flay
       masses[hash] *= (nodes.size) if identical[hash]
     end
 
+    count = 0
     masses.sort_by { |h,m| [-m, hashes[h].first.file] }.each do |hash,mass|
       nodes = hashes[hash]
       next unless nodes.first.first == prune if prune
@@ -117,8 +162,9 @@ class Flay
                        ["Similar",   ""]
                      end
 
-      puts "%s code found in %p (mass%s = %d)" %
-        [match, node.first, bonus, mass]
+      count += 1
+      puts "%d) %s code found in %p (mass%s = %d)" %
+        [count, match, node.first, bonus, mass]
 
       nodes.each_with_index do |node, i|
         if $v then
@@ -169,6 +215,7 @@ class Sexp
 
     # TODO: I think this is wrong, since it isn't positional. What to do?
     l_sexp.zip(r_sexp).each do |l_sub, r_sub|
+      next unless l_sub && r_sub # HACK
       l2, s2, r2 = l_sub.compare_to r_sub
       l += l2
       s += s2
@@ -202,6 +249,35 @@ class Sexp
       next unless Sexp === sexp
 
       yield sexp
+    end
+  end
+end
+
+class Array
+  def intersection other
+    intersection, start = [], 0
+    other_size = other.length
+    self.each_with_index do |m, i|
+      (start...other_size).each do |j|
+        n = other.at j
+        if m == n then
+          intersection << m
+          start = j + 1
+          break
+        end
+      end
+    end
+    intersection
+  end
+
+  def triangle # TODO: use?
+    max = self.size
+    (0...max).each do |i|
+      o1 = at(i)
+      (i+1...max).each do |j|
+        o2 = at(j)
+        yield o1, o2
+      end
     end
   end
 end

@@ -3,7 +3,19 @@
 require 'test/unit'
 require 'flay'
 
-class SexpTest < Test::Unit::TestCase
+require 'pp' # TODO: remove
+
+class Symbol # for testing only, makes the tests concrete
+  def hash
+    to_s.hash
+  end
+
+  def <=> o
+    Symbol === o && self.to_s <=> o.to_s
+  end
+end
+
+class TestSexp < Test::Unit::TestCase
   def setup
     # a(1) { |c| d }
     @s = s(:iter,
@@ -47,7 +59,7 @@ class SexpTest < Test::Unit::TestCase
           s(:lasgn, :c),
           s(:call, nil, :d, s(:arglist)))
 
-    hash = 992252
+    hash = 955256285
 
     assert_equal hash, s.fuzzy_hash,             "hand copy"
     assert_equal hash, @s.fuzzy_hash,            "ivar from setup"
@@ -56,10 +68,10 @@ class SexpTest < Test::Unit::TestCase
   end
 
   def test_all_subhashes
-    expected = [187948, 214336, 214416, 214496, 283760, 380700]
+    expected = [-704571402, -282578980, -35395725,
+                160138040, 815971090, 927228382] # , 955256285]
 
     assert_equal expected, @s.all_subhashes.sort.uniq
-    assert ! @s.all_subhashes.include?(@s.fuzzy_hash)
 
     x = []
 
@@ -70,4 +82,135 @@ class SexpTest < Test::Unit::TestCase
     assert_equal expected, x.sort.uniq
   end
 
+  def test_process_sexp
+    flay = Flay.new
+
+    s = RubyParser.new.process <<-RUBY
+      def x(n)
+        if n % 2 == 0
+          return n
+        else
+          return n + 1
+        end
+      end
+    RUBY
+
+    expected = [[:block],
+                # HACK [:defn],
+                [:scope]] # only ones big enough
+
+    flay.process_sexp s
+
+    actual = flay.hashes.values.map { |sexps| sexps.map { |sexp| sexp.first } }
+
+    assert_equal expected, actual.sort_by { |a| a.first.to_s }
+  end
+
+  def test_process_sexp_full
+    flay = Flay.new(1)
+
+    s = RubyParser.new.process <<-RUBY
+      def x(n)
+        if n % 2 == 0
+          return n
+        else
+          return n + 1
+        end
+      end
+    RUBY
+
+    expected = [[:arglist, :arglist, :arglist],
+                [:block],
+                [:call, :call],
+                [:call],
+                # HACK [:defn],
+                [:if],
+                [:return],
+                [:return],
+                [:scope]]
+
+    flay.process_sexp s
+
+    actual = flay.hashes.values.map { |sexps| sexps.map { |sexp| sexp.first } }
+
+    assert_equal expected, actual.sort_by { |a| a.first.to_s }
+  end
+
+  def test_process_sexp_no_structure
+    flay = Flay.new(1)
+    flay.process_sexp s(:lit, 1)
+
+    assert flay.hashes.empty?
+  end
+
+  def test_process_fuzzy_similarities
+    flay = Flay.new 7
+
+    s1 = RubyParser.new.process("def w(n); a; b; c; d; e; end")
+    s2 = RubyParser.new.process("def x(n); a;    c;    e; end")
+
+    flay.process_sexp s1
+    flay.process_sexp s2
+
+    flay.process_fuzzy_similarities
+
+    b1 = s1.scope.block
+    b2 = s2.scope.block
+
+    assert_equal [b2, b1], flay.hashes[b2.hash]
+  end
+
+  def test_process_fuzzy_similarities_2
+    flay = Flay.new 7
+
+    s1 = RubyParser.new.process("def w(n); a; b; c; d; e; end")
+    s2 = RubyParser.new.process("def x(n); a;    c;    e; end")
+    s3 = RubyParser.new.process("def y(n); a; f; c; g; e; end")
+
+    flay.process_sexp s1
+    flay.process_sexp s2
+    flay.process_sexp s3
+
+    flay.process_fuzzy_similarities
+
+    b1 = s1.scope.block
+    b2 = s2.scope.block
+    b3 = s3.scope.block
+
+    assert_equal [b3, b2, b1], flay.hashes[b3.hash]
+  end
+
+  def test_process_fuzzy_similarities_3
+    flay = Flay.new 7
+
+    s1 = RubyParser.new.process("def w (n); a; b;      c; d;      e; end")
+    s2 = RubyParser.new.process("def x (n); a;         c;         e; end")
+    s3 = RubyParser.new.process("def y (n); a; f;      c; g;      e; end")
+    s4 = RubyParser.new.process("def z (n); f; g;      h; i;      j; end")
+    s5 = RubyParser.new.process("def w1(n); a; b if x; c; d if y; e; end")
+
+    flay.process_sexp s1
+    flay.process_sexp s2
+    flay.process_sexp s3
+    flay.process_sexp s4
+    flay.process_sexp s5
+
+    flay.process_fuzzy_similarities
+
+    b1 = s1.scope.block
+    b2 = s2.scope.block
+    b3 = s3.scope.block
+    b5 = s5.scope.block
+
+    assert_equal [b3, b5, b2, b1], flay.hashes[b3.hash]
+  end
+end
+
+class ArrayIntersectionTests < Test::Unit::TestCase
+  def test_real_array_intersection
+    assert_equal [2], [2, 2, 2, 3, 7, 13, 49] & [2, 2, 2, 5, 11, 107]
+    assert_equal [2, 2, 2], [2, 2, 2, 3, 7, 13, 49].intersection([2, 2, 2, 5, 11, 107])
+    assert_equal ['a', 'c'], ['a', 'b', 'a', 'c'] & ['a', 'c', 'a', 'd']
+    assert_equal ['a', 'a'], ['a', 'b', 'a', 'c'].intersection(['a', 'c', 'a', 'd'])
+  end
 end
