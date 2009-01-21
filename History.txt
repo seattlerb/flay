@@ -1,10 +1,15 @@
-=== 1.1.0 / 2008-11-21
+=== 1.1.0 / 2009-01-20
 
-* 3 minor enhancement:
+* 8 minor enhancement:
 
   * Added -v verbose mode to print out N-way diff of the detected code.
   * Added identical node scoring and reporting.
   * Added the start of copy/paste+edit detection, not even close yet
+  * Added more tests.
+  * Added rcov tasks
+  * Added the start of copy/paste+edit detection
+  * Clarified output a bit
+  * Refactored process_sexps to make doing other languages/systems easier.
 
 === 1.0.0 / 2008-11-06
 
