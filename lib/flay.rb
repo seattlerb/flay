@@ -17,6 +17,17 @@ if $v then
   require 'tempfile'
 end
 
+abort "update rubygems to >= 1.3.1" unless  Gem.respond_to? :find_files
+
+Gem.find_files("flay_*.rb").each do |plugin|
+  begin
+    warn "Found #{File.basename(plugin, ".rb")}"
+    load plugin
+  rescue LoadError => e
+    warn "error loading #{plugin.inspect}: #{e.message}. skipping..."
+  end
+end
+
 class Flay
   VERSION = '1.1.0'
 
@@ -32,13 +43,33 @@ class Flay
     files.each do |file|
       warn "Processing #{file}"
 
-      pt = RubyParser.new.process(File.read(file), file)
-      next unless pt # empty files... hahaha, suck.
+      ext = File.extname(file).sub(/^\./, '')
+      ext = "rb" if ext.nil? || ext.empty?
+      msg = "process_#{ext}"
 
-      process_sexp pt
+      unless respond_to? msg then
+        warn "  Unknown file type: #{ext}, defaulting to ruby"
+        msg = "process_rb"
+      end
+
+      sexp = begin
+               send msg, file
+             rescue => e
+               warn "  #{e.message.strip}"
+               warn "  skipping #{file}"
+               nil
+             end
+
+      next unless sexp
+
+      process_sexp sexp
     end
 
     process_fuzzy_similarities if $f
+  end
+
+  def process_rb file
+    RubyParser.new.process(File.read(file), file)
   end
 
   def process_sexp pt
