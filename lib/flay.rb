@@ -24,6 +24,19 @@ class Flay
       opts.banner  = 'flay [options] files_or_dirs'
       opts.version = Flay::VERSION
 
+      opts.separator ""
+      opts.separator "Specific options:"
+      opts.separator ""
+
+      opts.on('-h', '--help', 'Display this help.') do
+        puts opts
+        exit
+      end
+
+      opts.on('-f', '--fuzzy', "Attempt to do fuzzy similarities. (SLOW)") do
+        options[:fuzzy] = true
+      end
+
       opts.on('-m', '--mass MASS', Integer, "Sets mass threshold") do |m|
         options[:mass] = m.to_i
       end
@@ -32,14 +45,10 @@ class Flay
         options[:verbose] = true
       end
 
-      opts.on('-f', '--fuzzy', "Attempt to do fuzzy similarities. (SLOW)") do
-        options[:fuzzy] = true
-      end
+      extensions = ['rb'] + Flay.load_plugins
 
-      opts.on_tail('-h', '--help', 'Display this help.') do
-        puts opts
-        exit
-      end
+      opts.separator ""
+      opts.separator "Known extensions: #{extensions.join(', ')}"
     end.parse!
 
     options
