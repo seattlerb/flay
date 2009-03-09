@@ -1,42 +1,84 @@
 #!/usr/bin/env ruby -w
 
 $: << "../../ruby_parser/dev/lib"
+$: << "../../ruby2ruby/dev/lib"
 
+require 'optparse'
 require 'rubygems'
 require 'sexp_processor'
 require 'ruby_parser'
-require 'pp' # TODO: remove
-
-$m ||= 16
-$v ||= false
-$f ||= false
-
-if $v then
-  $: << "../../ruby2ruby/dev/lib"
-  require 'ruby2ruby'
-  require 'tempfile'
-end
 
 abort "update rubygems to >= 1.3.1" unless  Gem.respond_to? :find_files
-
-Gem.find_files("flay_*.rb").each do |plugin|
-  begin
-    warn "Found #{File.basename(plugin, ".rb")}"
-    load plugin
-  rescue LoadError => e
-    warn "error loading #{plugin.inspect}: #{e.message}. skipping..."
-  end
-end
 
 class Flay
   VERSION = '1.1.0'
 
-  attr_accessor :mass_threshold
-  attr_reader :hashes
+  def self.parse_options
+    options = {
+      :fuzzy   => false,
+      :verbose => false,
+      :mass    => 16,
+    }
 
-  def initialize(mass = 16)
+    OptionParser.new do |opts|
+      opts.banner  = 'flay [options] files_or_dirs'
+      opts.version = Flay::VERSION
+
+      opts.on('-m', '--mass MASS', Integer, "Sets mass threshold") do |m|
+        options[:mass] = m.to_i
+      end
+
+      opts.on('-v', '--verbose', "Verbose. Display N-Way diff for ruby.") do
+        options[:verbose] = true
+      end
+
+      opts.on('-f', '--fuzzy', "Attempt to do fuzzy similarities. (SLOW)") do
+        options[:fuzzy] = true
+      end
+
+      opts.on_tail('-h', '--help', 'Display this help.') do
+        puts opts
+        exit
+      end
+    end.parse!
+
+    options
+  end
+
+  def self.expand_dirs_to_files
+    extensions = ['rb'] + Flay.load_plugins
+
+    ARGV.map { |p|
+      if File.directory? p then
+        Dir[File.join(p, '**', "*.{#{extensions.join(',')}}")]
+      else
+        p
+      end
+    }.flatten
+  end
+
+  def self.load_plugins
+    plugins = Gem.find_files("flay_*.rb")
+
+    plugins.each do |plugin|
+      begin
+        load plugin
+      rescue LoadError => e
+        warn "error loading #{plugin.inspect}: #{e.message}. skipping..."
+      end
+    end
+
+    plugins.map { |f| File.basename(f, '.rb').sub(/^flay_/, '') }
+  end
+
+  attr_accessor :mass_threshold
+  attr_reader :hashes, :option
+
+  def initialize option = {}
+    @option = option
     @hashes = Hash.new { |h,k| h[k] = [] }
-    @mass_threshold = mass
+    self.mass_threshold = option[:mass]
+    require 'ruby2ruby' if option[:verbose]
   end
 
   def process(*files)
@@ -65,7 +107,7 @@ class Flay
       process_sexp sexp
     end
 
-    process_fuzzy_similarities if $f
+    process_fuzzy_similarities if option[:fuzzy]
   end
 
   def process_rb file
@@ -198,7 +240,7 @@ class Flay
         [count, match, node.first, bonus, mass]
 
       nodes.each_with_index do |node, i|
-        if $v then
+        if option[:verbose] then
           c = (?A + i).chr
           puts "  #{c}: #{node.file}:#{node.line}"
         else
@@ -206,7 +248,7 @@ class Flay
         end
       end
 
-      if $v then
+      if option[:verbose] then
         puts
         r2r = Ruby2Ruby.new
         puts n_way_diff(*nodes.map { |s| r2r.process(s.deep_clone) })

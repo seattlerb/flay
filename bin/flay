@@ -1,7 +1,7 @@
-#!/usr/bin/ruby -s
+#!/usr/bin/ruby
 
 require 'flay'
 
-flay = Flay.new($m.to_i)
-flay.process(*ARGV)
+flay = Flay.new Flay.parse_options
+flay.process(*Flay.expand_dirs_to_files)
 flay.report
