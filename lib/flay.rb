@@ -13,12 +13,16 @@ abort "update rubygems to >= 1.3.1" unless  Gem.respond_to? :find_files
 class Flay
   VERSION = '1.1.0'
 
-  def self.parse_options
-    options = {
+  def self.default_options
+    {
       :fuzzy   => false,
       :verbose => false,
       :mass    => 16,
     }
+  end
+
+  def self.parse_options
+    options = self.default_options
 
     OptionParser.new do |opts|
       opts.banner  = 'flay [options] files_or_dirs'
@@ -54,10 +58,10 @@ class Flay
     options
   end
 
-  def self.expand_dirs_to_files
+  def self.expand_dirs_to_files *dirs
     extensions = ['rb'] + Flay.load_plugins
 
-    ARGV.map { |p|
+    dirs.flatten.map { |p|
       if File.directory? p then
         Dir[File.join(p, '**', "*.{#{extensions.join(',')}}")]
       else
@@ -80,14 +84,19 @@ class Flay
     plugins.map { |f| File.basename(f, '.rb').sub(/^flay_/, '') }
   end
 
-  attr_accessor :mass_threshold
+  attr_accessor :mass_threshold, :total, :identical, :masses
   attr_reader :hashes, :option
 
-  def initialize option = {}
-    @option = option
+  def initialize option = nil
+    @option = option || Flay.default_options
     @hashes = Hash.new { |h,k| h[k] = [] }
-    self.mass_threshold = option[:mass]
-    require 'ruby2ruby' if option[:verbose]
+
+    self.identical      = {}
+    self.masses         = {}
+    self.total          = 0
+    self.mass_threshold = @option[:mass]
+
+    require 'ruby2ruby' if @option[:verbose]
   end
 
   def process(*files)
@@ -117,6 +126,15 @@ class Flay
     end
 
     process_fuzzy_similarities if option[:fuzzy]
+
+    self.prune
+
+    self.hashes.each do |hash,nodes|
+      identical[hash] = nodes[1..-1].all? { |n| n == nodes.first }
+      masses[hash] = nodes.first.mass * nodes.size
+      masses[hash] *= (nodes.size) if identical[hash]
+      self.total += masses[hash]
+    end
   end
 
   def process_rb file
@@ -218,19 +236,11 @@ class Flay
   end
 
   def report prune = nil
-    self.prune
-
-    identical = {}
-    masses = {}
-
-    self.hashes.each do |hash,nodes|
-      identical[hash] = nodes[1..-1].all? { |n| n == nodes.first }
-      masses[hash] = nodes.first.mass * nodes.size
-      masses[hash] *= (nodes.size) if identical[hash]
-    end
+    puts "Total score (lower is better) = #{self.total}"
+    puts
 
     count = 0
-    masses.sort_by { |h,m| [-m, hashes[h].first.file] }.each do |hash,mass|
+    masses.sort_by { |h,m| [-m, hashes[h].first.file] }.each do |hash, mass|
       nodes = hashes[hash]
       next unless nodes.first.first == prune if prune
       puts
