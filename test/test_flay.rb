@@ -107,7 +107,7 @@ class TestSexp < Test::Unit::TestCase
   end
 
   def test_process_sexp_full
-    flay = Flay.new(1)
+    flay = Flay.new(:mass => 1)
 
     s = RubyParser.new.process <<-RUBY
       def x(n)
@@ -137,14 +137,14 @@ class TestSexp < Test::Unit::TestCase
   end
 
   def test_process_sexp_no_structure
-    flay = Flay.new(1)
+    flay = Flay.new(:mass => 1)
     flay.process_sexp s(:lit, 1)
 
     assert flay.hashes.empty?
   end
 
   def test_process_fuzzy_similarities
-    flay = Flay.new 7
+    flay = Flay.new :mass => 7
 
     s1 = RubyParser.new.process("def w(n); a; b; c; d; e; end")
     s2 = RubyParser.new.process("def x(n); a;    c;    e; end")
@@ -161,7 +161,7 @@ class TestSexp < Test::Unit::TestCase
   end
 
   def test_process_fuzzy_similarities_2
-    flay = Flay.new 7
+    flay = Flay.new :mass => 7
 
     s1 = RubyParser.new.process("def w(n); a; b; c; d; e; end")
     s2 = RubyParser.new.process("def x(n); a;    c;    e; end")
@@ -181,7 +181,7 @@ class TestSexp < Test::Unit::TestCase
   end
 
   def test_process_fuzzy_similarities_3
-    flay = Flay.new 7
+    flay = Flay.new :mass => 7
 
     s1 = RubyParser.new.process("def w (n); a; b;      c; d;      e; end")
     s2 = RubyParser.new.process("def x (n); a;         c;         e; end")
