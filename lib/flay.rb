@@ -71,7 +71,7 @@ class Flay
   end
 
   def self.load_plugins
-    plugins = Gem.find_files("flay_*.rb")
+    plugins = Gem.find_files("flay_*.rb").reject { |path| path =~ /flay_task/ }
 
     plugins.each do |plugin|
       begin
