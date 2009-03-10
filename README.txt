@@ -5,23 +5,26 @@
 
 == DESCRIPTION:
 
-Flay analyzes ruby code for structural similarities. Differences in
-literal values, variable, class, method names, whitespace, programming
-style, braces vs do/end, etc are all ignored. Making this totally rad.
+Flay analyzes code for structural similarities. Differences in literal
+values, variable, class, method names, whitespace, programming style,
+braces vs do/end, etc are all ignored. Making this totally rad.
 
 == FEATURES/PROBLEMS:
 
+* Plugin system allows other languages to be flayed.
+  * Ships with .rb and .erb. javascript and others will be available separately.
+* Includes FlayTask for Rakefiles.
 * Differences in literal values, variable, class, and method names are ignored.
 * Differences in whitespace, programming style, braces vs do/end, etc are ignored.
 * Works across files.
 * Reports differences at any level of code.
+* Totally rad.
 * Adds a score multiplier to identical nodes.
 * Run verbose to see an N-way diff of the code.
 
 == TODO:
 
 * Editor integration (emacs, textmate, other contributions welcome).
-* UI improvement suggestions welcome. :)
 * Score sequence fragments (a;b;c;d;e) vs (b;c;d) etc.
 
 == SYNOPSIS:
@@ -77,7 +80,7 @@ style, braces vs do/end, etc are all ignored. Making this totally rad.
 
 (The MIT License)
 
-Copyright (c) 2008 Ryan Davis, Seattle.rb
+Copyright (c) 2008-2009 Ryan Davis, Seattle.rb
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

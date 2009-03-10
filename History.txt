@@ -1,3 +1,17 @@
+=== 1.2.0 / 2009-03-09
+
+* 2 major enhancements:
+
+  * Added flay_task.rb
+  * Added plugin system (any flay_(c,java,js,etc).rb files).
+
+* 4 minor enhancements:
+
+  * Added expand_dirs_to_files and made dirs valid arguments.
+  * Added flay_erb.rb plugin.
+  * Added optparse option processing.
+  * Refactored to make using w/in rake and other CI systems clean and easy.
+
 === 1.1.0 / 2009-01-20
 
 * 7 minor enhancement:
@@ -15,4 +29,3 @@
 * 1 major enhancement
 
   * Birthday!
-

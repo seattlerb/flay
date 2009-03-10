@@ -4,4 +4,6 @@ README.txt
 Rakefile
 bin/flay
 lib/flay.rb
+lib/flay_erb.rb
+lib/flay_task.rb
 test/test_flay.rb
