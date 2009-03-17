@@ -6,7 +6,11 @@ require 'hoe'
 Hoe::add_include_dirs("../../sexp_processor/dev/lib",
                       "../../ruby_parser/dev/lib")
 
-require 'flay'
+begin
+  require 'flay'
+rescue LoadError
+  load 'lib/flay.rb'
+end
 
 Hoe.new('flay', Flay::VERSION) do |flay|
   flay.rubyforge_name = 'seattlerb'
