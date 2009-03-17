@@ -6,7 +6,7 @@ class FlayTask < Rake::TaskLib
 
   def initialize name = :flay, threshold = 200, dirs = nil
     @name      = name
-    @dirs      = dirs || %w(app lib test spec)
+    @dirs      = dirs || %w(app bin lib spec test)
     @threshold = threshold
     @verbose   = Rake.application.options.trace
 
@@ -24,7 +24,8 @@ class FlayTask < Rake::TaskLib
       flay.process(*Flay.expand_dirs_to_files(dirs))
       flay.report if verbose
 
-      raise "Flay total too high! #{flay.total} > #{threshold}" if flay.total > threshold
+      raise "Flay total too high! #{flay.total} > #{threshold}" if
+        flay.total > threshold
     end
     self
   end
