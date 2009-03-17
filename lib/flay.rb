@@ -11,7 +11,7 @@ require 'ruby_parser'
 abort "update rubygems to >= 1.3.1" unless  Gem.respond_to? :find_files
 
 class Flay
-  VERSION = '1.2.0'
+  VERSION = '1.2.1'
 
   def self.default_options
     {

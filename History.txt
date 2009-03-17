@@ -1,3 +1,15 @@
+=== 1.2.1 / 2009-03-16
+
+* 3 minor enhancements:
+
+  * Added gauntlet_flay.rb
+  * Cached value of plugins loaded.
+  * Refactored and separated analysis phase from process phase
+
+* 1 bug fix:
+
+  * Added bin dir to default dirs list in FlayTask
+
 === 1.2.0 / 2009-03-09
 
 * 2 major enhancements:
