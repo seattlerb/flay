@@ -71,17 +71,20 @@ class Flay
   end
 
   def self.load_plugins
-    plugins = Gem.find_files("flay_*.rb").reject { |path| path =~ /flay_task/ }
+    unless defined? @@plugins then
+      plugins = Gem.find_files("flay_*.rb").reject { |p| p =~ /flay_task/ }
 
-    plugins.each do |plugin|
-      begin
-        load plugin
-      rescue LoadError => e
-        warn "error loading #{plugin.inspect}: #{e.message}. skipping..."
+      plugins.each do |plugin|
+        begin
+          load plugin
+        rescue LoadError => e
+          warn "error loading #{plugin.inspect}: #{e.message}. skipping..."
+        end
       end
-    end
 
-    plugins.map { |f| File.basename(f, '.rb').sub(/^flay_/, '') }
+      @@plugins = plugins.map { |f| File.basename(f, '.rb').sub(/^flay_/, '') }
+    end
+    @@plugins
   end
 
   attr_accessor :mass_threshold, :total, :identical, :masses
@@ -99,7 +102,7 @@ class Flay
     require 'ruby2ruby' if @option[:verbose]
   end
 
-  def process(*files)
+  def process(*files) # TODO: rename from process - should act as SexpProcessor
     files.each do |file|
       warn "Processing #{file}"
 
@@ -127,6 +130,10 @@ class Flay
 
     process_fuzzy_similarities if option[:fuzzy]
 
+    analyze
+  end
+
+  def analyze
     self.prune
 
     self.hashes.each do |hash,nodes|
