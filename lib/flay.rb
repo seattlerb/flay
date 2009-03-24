@@ -115,17 +115,21 @@ class Flay
         msg = "process_rb"
       end
 
-      sexp = begin
-               send msg, file
-             rescue => e
-               warn "  #{e.message.strip}"
-               warn "  skipping #{file}"
-               nil
-             end
+      begin
+        sexp = begin
+                 send msg, file
+               rescue => e
+                 warn "  #{e.message.strip}"
+                 warn "  skipping #{file}"
+                 nil
+               end
 
-      next unless sexp
+        next unless sexp
 
-      process_sexp sexp
+        process_sexp sexp
+      rescue SyntaxError => e
+        warn "  skipping #{file}: #{e.message}"
+      end
     end
 
     process_fuzzy_similarities if option[:fuzzy]
