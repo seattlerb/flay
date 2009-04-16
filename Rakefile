@@ -19,7 +19,7 @@ Hoe.new('flay', Flay::VERSION) do |flay|
   flay.flay_threshold = 250
 
   flay.extra_deps << ['sexp_processor', '~> 3.0']
-  flay.extra_deps << ['ruby_parser',    '~> 1.1.0']
+  flay.extra_deps << ['ruby_parser',    '~> 2.0']
 end
 
 begin
