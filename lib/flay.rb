@@ -11,13 +11,15 @@ require 'ruby_parser'
 abort "update rubygems to >= 1.3.1" unless  Gem.respond_to? :find_files
 
 class Flay
-  VERSION = '1.2.1'
+  VERSION = '1.2.2'
 
   def self.default_options
     {
       :fuzzy   => false,
-      :verbose => false,
+      :diff    => false,
       :mass    => 16,
+      :summary => false,
+      :verbose => false,
     }
   end
 
@@ -45,15 +47,29 @@ class Flay
         options[:mass] = m.to_i
       end
 
-      opts.on('-v', '--verbose', "Verbose. Display N-Way diff for ruby.") do
+      opts.on('-v', '--verbose', "Verbose. Show progress processing files.") do
         options[:verbose] = true
+      end
+
+      opts.on('-d', '--diff', "Diff Mode. Display N-Way diff for ruby.") do
+        options[:diff] = true
+      end
+
+      opts.on('-s', '--summary', "Summarize. Show flay score per file only.") do
+        options[:summary] = true
       end
 
       extensions = ['rb'] + Flay.load_plugins
 
       opts.separator ""
       opts.separator "Known extensions: #{extensions.join(', ')}"
-    end.parse!
+
+      begin
+        opts.parse!
+      rescue => e
+        abort "#{e}\n\n#{opts}"
+      end
+    end
 
     options
   end
@@ -99,12 +115,12 @@ class Flay
     self.total          = 0
     self.mass_threshold = @option[:mass]
 
-    require 'ruby2ruby' if @option[:verbose]
+    require 'ruby2ruby' if @option[:diff]
   end
 
   def process(*files) # TODO: rename from process - should act as SexpProcessor
     files.each do |file|
-      warn "Processing #{file}"
+      warn "Processing #{file}" if option[:verbose]
 
       ext = File.extname(file).sub(/^\./, '')
       ext = "rb" if ext.nil? || ext.empty?
@@ -246,9 +262,32 @@ class Flay
     groups.flatten.join("\n")
   end
 
+  def summary
+    score = Hash.new 0
+
+    masses.each do |hash, mass|
+      sexps = hashes[hash]
+      mass_per_file = mass.to_f / sexps.size
+      sexps.each do |sexp|
+        score[sexp.file] += mass_per_file
+      end
+    end
+
+    score
+  end
+
   def report prune = nil
     puts "Total score (lower is better) = #{self.total}"
     puts
+
+    if option[:summary] then
+
+      self.summary.sort_by { |_,v| -v }.each do |file, score|
+        puts "%8.2f: %s" % [score, file]
+      end
+
+      return
+    end
 
     count = 0
     masses.sort_by { |h,m| [-m, hashes[h].first.file] }.each do |hash, mass|
@@ -270,7 +309,7 @@ class Flay
         [count, match, node.first, bonus, mass]
 
       nodes.each_with_index do |node, i|
-        if option[:verbose] then
+        if option[:diff] then
           c = (?A + i).chr
           puts "  #{c}: #{node.file}:#{node.line}"
         else
@@ -278,7 +317,7 @@ class Flay
         end
       end
 
-      if option[:verbose] then
+      if option[:diff] then
         puts
         r2r = Ruby2Ruby.new
         puts n_way_diff(*nodes.map { |s| r2r.process(s.deep_clone) })
