@@ -8,14 +8,11 @@ require 'rubygems'
 require 'sexp_processor'
 require 'ruby_parser'
 
-abort "update rubygems to >= 1.3.1" unless  Gem.respond_to? :find_files
-
 class Flay
   VERSION = '1.2.2'
 
   def self.default_options
     {
-      :fuzzy   => false,
       :diff    => false,
       :mass    => 16,
       :summary => false,
@@ -39,8 +36,8 @@ class Flay
         exit
       end
 
-      opts.on('-f', '--fuzzy', "Attempt to do fuzzy similarities. (SLOW)") do
-        options[:fuzzy] = true
+      opts.on('-f', '--fuzzy', "DEAD: fuzzy similarities.") do
+        abort "--fuzzy is no longer supported. Sorry. It sucked."
       end
 
       opts.on('-m', '--mass MASS', Integer, "Sets mass threshold") do |m|
@@ -101,6 +98,8 @@ class Flay
       @@plugins = plugins.map { |f| File.basename(f, '.rb').sub(/^flay_/, '') }
     end
     @@plugins
+  rescue
+    # ignore
   end
 
   attr_accessor :mass_threshold, :total, :identical, :masses
@@ -148,8 +147,6 @@ class Flay
       end
     end
 
-    process_fuzzy_similarities if option[:fuzzy]
-
     analyze
   end
 
@@ -174,42 +171,6 @@ class Flay
       next if node.mass < self.mass_threshold
 
       self.hashes[node.fuzzy_hash] << node
-    end
-  end
-
-  def process_fuzzy_similarities
-    all_hashes, detected = {}, {}
-
-    self.hashes.values.each do |nodes|
-      nodes.each do |node|
-        next if node.mass > 4 * self.mass_threshold
-        # TODO: try out with fuzzy_hash
-        # all_hashes[node] = node.grep(Sexp).map { |s| [s.hash] * s.mass }.flatten
-        all_hashes[node] = node.grep(Sexp).map { |s| [s.hash] }.flatten
-      end
-    end
-
-    # warn "looking for copy/paste/edit code across #{all_hashes.size} nodes"
-
-    all_hashes = all_hashes.to_a
-    all_hashes.each_with_index do |(s1, h1), i|
-      similar = [s1]
-      all_hashes[i+1..-1].each do |(s2, h2)|
-        next if detected[h2]
-        intersection = h1.intersection h2
-        max = [h1.size, h2.size].max
-        if intersection.size >= max * 0.60 then
-          similarity = s1.similarity(s2)
-          if similarity > 0.60 then
-            similar << s2
-            detected[h2] = true
-          else
-            p [similarity, s1, s2]
-          end
-        end
-      end
-
-      self.hashes[similar.first.hash].push(*similar) if similar.size > 1
     end
   end
 
@@ -308,12 +269,12 @@ class Flay
       puts "%d) %s code found in %p (mass%s = %d)" %
         [count, match, node.first, bonus, mass]
 
-      nodes.each_with_index do |node, i|
+      nodes.each_with_index do |x, i|
         if option[:diff] then
           c = (?A + i).chr
-          puts "  #{c}: #{node.file}:#{node.line}"
+          puts "  #{c}: #{x.file}:#{x.line}"
         else
-          puts "  #{node.file}:#{node.line}"
+          puts "  #{x.file}:#{x.line}"
         end
       end
 
