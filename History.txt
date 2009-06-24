@@ -1,3 +1,13 @@
+=== 1.3.0 / 2009-06-23
+
+* 5 minor enhancements:
+
+  * Added --summary to display flay scores per file.
+  * Added --verbose to display processing progress.
+  * Protect against syntax errors in bad code and continue flaying.
+  * Removed fuzzy matching. Never got it to feel right. Slow. Broken on 1.9
+  * Renamed --verbose to --diff.
+
 === 1.2.1 / 2009-03-16
 
 * 3 minor enhancements:
