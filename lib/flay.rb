@@ -170,7 +170,7 @@ class Flay
       next unless node.any? { |sub| Sexp === sub }
       next if node.mass < self.mass_threshold
 
-      self.hashes[node.fuzzy_hash] << node
+      self.hashes[node.structural_hash] << node
     end
   end
 
@@ -182,7 +182,7 @@ class Flay
     all_hashes = {}
     self.hashes.values.each do |nodes|
       nodes.each do |node|
-        node.all_subhashes.each do |h|
+        node.all_structural_subhashes.each do |h|
           all_hashes[h] = true
         end
       end
@@ -292,50 +292,14 @@ class String
 end
 
 class Sexp
-  def mass
-    @mass ||= self.structure.flatten.size
+  def structural_hash
+    @structural_hash ||= self.structure.hash
   end
 
-  alias :uncached_structure :structure
-  def structure
-    @structure ||= self.uncached_structure
-  end
-
-  def similarity o
-    l, s, r = self.compare_to o
-    (2.0 * s) / (2.0 * s + l + r)
-  end
-
-  def compare_to they
-    l = s = r = 0
-
-    l_sexp, l_lits = self.partition { |o| Sexp === o }
-    r_sexp, r_lits = they.partition { |o| Sexp === o }
-
-    l += (l_lits - r_lits).size
-    s += (l_lits & r_lits).size
-    r += (r_lits - l_lits).size
-
-    # TODO: I think this is wrong, since it isn't positional. What to do?
-    l_sexp.zip(r_sexp).each do |l_sub, r_sub|
-      next unless l_sub && r_sub # HACK
-      l2, s2, r2 = l_sub.compare_to r_sub
-      l += l2
-      s += s2
-      r += r2
-    end
-
-    return l, s, r
-  end
-
-  def fuzzy_hash
-    @fuzzy_hash ||= self.structure.hash
-  end
-
-  def all_subhashes
+  def all_structural_subhashes
     hashes = []
     self.deep_each do |node|
-      hashes << node.fuzzy_hash
+      hashes << node.structural_hash
     end
     hashes
   end
@@ -352,35 +316,6 @@ class Sexp
       next unless Sexp === sexp
 
       yield sexp
-    end
-  end
-end
-
-class Array
-  def intersection other
-    intersection, start = [], 0
-    other_size = other.length
-    self.each_with_index do |m, i|
-      (start...other_size).each do |j|
-        n = other.at j
-        if m == n then
-          intersection << m
-          start = j + 1
-          break
-        end
-      end
-    end
-    intersection
-  end
-
-  def triangle # TODO: use?
-    max = self.size
-    (0...max).each do |i|
-      o1 = at(i)
-      (i+1...max).each do |j|
-        o2 = at(j)
-        yield o1, o2
-      end
     end
   end
 end
