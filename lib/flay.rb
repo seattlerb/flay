@@ -85,17 +85,20 @@ class Flay
 
   def self.load_plugins
     unless defined? @@plugins then
+      @@plugins = []
+
       plugins = Gem.find_files("flay_*.rb").reject { |p| p =~ /flay_task/ }
 
       plugins.each do |plugin|
+        plugin_name = File.basename(plugin, '.rb').sub(/^flay_/, '')
+        next if @@plugins.include? plugin_name
         begin
           load plugin
+          @@plugins << plugin_name
         rescue LoadError => e
           warn "error loading #{plugin.inspect}: #{e.message}. skipping..."
         end
       end
-
-      @@plugins = plugins.map { |f| File.basename(f, '.rb').sub(/^flay_/, '') }
     end
     @@plugins
   rescue

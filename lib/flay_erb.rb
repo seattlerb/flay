@@ -8,7 +8,12 @@ class Flay
   def process_erb file
     erb = File.read file
 
-    src = ERB.new(erb).src
-    RubyParser.new.process(src, file)
+    ruby = ERB.new(erb).src
+    begin
+      RubyParser.new.process(ruby, file)
+    rescue => e
+      warn ruby if option[:verbose]
+      raise e
+    end
   end
 end
