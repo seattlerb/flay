@@ -5,22 +5,6 @@ require 'flay'
 
 $: << "../../sexp_processor/dev/lib"
 
-require 'pp' # TODO: remove
-
-ON_1_9 = RUBY_VERSION =~ /1\.9/
-SKIP_1_9 = true && ON_1_9 # HACK
-
-class Symbol # for testing only, makes the tests concrete
-  def hash
-    to_s.hash
-  end
-
-  alias :crap :<=> if :blah.respond_to? :<=>
-  def <=> o
-    Symbol === o && self.to_s <=> o.to_s
-  end
-end
-
 class TestSexp < Test::Unit::TestCase
   def setup
     # a(1) { |c| d }
@@ -31,22 +15,29 @@ class TestSexp < Test::Unit::TestCase
   end
 
   def test_structural_hash
-    s = s(:iter,
-          s(:call, nil, :a, s(:arglist, s(:lit, 1))),
-          s(:lasgn, :c),
-          s(:call, nil, :d, s(:arglist)))
+    hash = s(:iter,
+             s(:call, s(:arglist, s(:lit))),
+             s(:lasgn),
+             s(:call, s(:arglist))).hash
 
-    hash = 955256285
-
-    assert_equal hash, s.structural_hash,             "hand copy"
-    assert_equal hash, @s.structural_hash,            "ivar from setup"
-    assert_equal hash, @s.deep_clone.structural_hash, "deep clone"
-    assert_equal hash, s.deep_clone.structural_hash,  "copy deep clone"
-  end unless SKIP_1_9
+    assert_equal hash, @s.structural_hash
+    assert_equal hash, @s.deep_clone.structural_hash
+  end
 
   def test_all_structural_subhashes
-    expected = [-704571402, -282578980, -35395725,
-                160138040, 815971090, 927228382]
+    s = s(:iter,
+          s(:call, s(:arglist, s(:lit))),
+          s(:lasgn),
+          s(:call, s(:arglist)))
+
+    expected = [
+                s[1]      .hash,
+                s[1][1]   .hash,
+                s[1][1][1].hash,
+                s[2]      .hash,
+                s[3]      .hash,
+                s[3][1]   .hash,
+               ].sort
 
     assert_equal expected, @s.all_structural_subhashes.sort.uniq
 
@@ -57,7 +48,7 @@ class TestSexp < Test::Unit::TestCase
     end
 
     assert_equal expected, x.sort.uniq
-  end unless SKIP_1_9
+  end
 
   def test_process_sexp
     flay = Flay.new
