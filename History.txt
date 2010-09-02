@@ -1,3 +1,14 @@
+=== 1.4.1 / 2010-09-01
+
+* 2 minor enhancements:
+
+  * Added extra error handling for ERB flay to deal with tons of bad ERB
+  * Skip plugin if another version already loaded (eg local vs gem).
+
+* 1 bug fix:
+
+  * Fixed all tests that were having problems on 1.9 due to unstable hashes
+
 === 1.4.0 / 2009-08-14
 
 * 4 minor enhancements:
