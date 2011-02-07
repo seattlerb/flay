@@ -20,6 +20,7 @@ class FlayTask < Rake::TaskLib
   def define
     desc "Analyze for code duplication in: #{dirs.join(', ')}"
     task name do
+      require "flay"
       flay = Flay.new
       flay.process(*Flay.expand_dirs_to_files(dirs))
       flay.report if verbose
