@@ -1,11 +1,11 @@
 #!/usr/bin/ruby -w
 
-require 'test/unit'
+require 'minitest/autorun'
 require 'flay'
 
 $: << "../../sexp_processor/dev/lib"
 
-class TestSexp < Test::Unit::TestCase
+class TestSexp < MiniTest::Unit::TestCase
   def setup
     # a(1) { |c| d }
     @s = s(:iter,
