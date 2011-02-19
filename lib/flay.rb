@@ -9,7 +9,7 @@ require 'sexp_processor'
 require 'ruby_parser'
 
 class Flay
-  VERSION = '1.4.1'
+  VERSION = '1.4.2'
 
   def self.default_options
     {

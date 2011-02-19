@@ -1,3 +1,9 @@
+=== 1.4.2 / 2011-02-18
+
+* 1 bug fix:
+
+  * Added flay require in flay_task
+
 === 1.4.1 / 2010-09-01
 
 * 2 minor enhancements:
