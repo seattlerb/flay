@@ -109,4 +109,31 @@ class TestSexp < MiniTest::Unit::TestCase
 
     assert flay.hashes.empty?
   end
+
+  def test_report
+    # make sure we run through options parser
+    $*.clear
+    $* << "-d"
+    $* << "--mass=1"
+    $* << "-v"
+
+    flay = Flay.new Flay.parse_options
+
+    s = RubyParser.new.process <<-RUBY
+      class Dog
+        def x
+          return "Hello"
+        end
+      end
+      class Cat
+        def y
+          return "Hello"
+        end
+      end
+    RUBY
+
+    flay.process_sexp s
+    flay.analyze
+    flay.report
+  end
 end
