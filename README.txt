@@ -1,7 +1,8 @@
 = flay
 
-* http://ruby.sadi.st/
-* http://rubyforge.org/projects/seattlerb
+home :: http://ruby.sadi.st/
+repo :: https://github.com/seattlerb/flay
+rdoc :: http://seattlerb.rubyforge.org/flay
 
 == DESCRIPTION:
 
@@ -80,7 +81,7 @@ braces vs do/end, etc are all ignored. Making this totally rad.
 
 (The MIT License)
 
-Copyright (c) 2008-2009 Ryan Davis, Seattle.rb
+Copyright (c) Ryan Davis, Seattle.rb
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
