@@ -197,7 +197,7 @@ class Flay
 
   def n_way_diff *data
     data.each_with_index do |s, i|
-      c = (?A + i).chr
+      c = (?A.ord + i).chr
       s.group = c
     end
 
@@ -274,7 +274,7 @@ class Flay
 
       nodes.each_with_index do |x, i|
         if option[:diff] then
-          c = (?A + i).chr
+          c = (?A.ord + i).chr
           puts "  #{c}: #{x.file}:#{x.line}"
         else
           puts "  #{x.file}:#{x.line}"

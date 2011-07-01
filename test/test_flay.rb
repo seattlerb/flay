@@ -109,4 +109,59 @@ class TestSexp < MiniTest::Unit::TestCase
 
     assert flay.hashes.empty?
   end
+
+  def test_report
+    # make sure we run through options parser
+    $*.clear
+    $* << "-d"
+    $* << "--mass=1"
+    $* << "-v"
+
+    opts = nil
+    capture_io do # ignored
+      opts = Flay.parse_options
+    end
+
+    flay = Flay.new opts
+
+    s = RubyParser.new.process <<-RUBY
+      class Dog
+        def x
+          return "Hello"
+        end
+      end
+      class Cat
+        def y
+          return "Hello"
+        end
+      end
+    RUBY
+
+    flay.process_sexp s
+    flay.analyze
+
+    out, err = capture_io do
+      flay.report nil
+    end
+
+    exp = <<-END.gsub(/\d+/, "N").gsub(/^ {6}/, "")
+      Total score (lower is better) = 16
+
+
+      1) Similar code found in :class (mass = 16)
+        A: (string):1
+        B: (string):6
+
+      A: class Dog
+      B: class Cat
+      A:   def x
+      B:   def y
+             return \"Hello\"
+           end
+         end
+    END
+
+    assert_equal '', err
+    assert_equal exp, out.gsub(/\d+/, "N")
+  end
 end
