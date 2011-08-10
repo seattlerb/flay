@@ -4,7 +4,8 @@ require 'rubygems'
 require 'hoe'
 
 Hoe::add_include_dirs("../../sexp_processor/dev/lib",
-                      "../../ruby_parser/dev/lib")
+                      "../../ruby_parser/dev/lib",
+                      "../../ruby2ruby/dev/lib")
 
 Hoe.plugin :seattlerb
 

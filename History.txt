@@ -1,3 +1,9 @@
+=== 1.4.3 / 2011-08-10
+
+* 1 bug fix:
+
+  * Fixes for 1.9 with --diff. (mmullis)
+
 === 1.4.2 / 2011-02-18
 
 * 2 bug fixes:
