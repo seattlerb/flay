@@ -53,7 +53,7 @@ class TestSexp < MiniTest::Unit::TestCase
   def test_process_sexp
     flay = Flay.new
 
-    s = RubyParser.new.process <<-RUBY
+    s = Ruby18Parser.new.process <<-RUBY
       def x(n)
         if n % 2 == 0
           return n
@@ -77,7 +77,7 @@ class TestSexp < MiniTest::Unit::TestCase
   def test_process_sexp_full
     flay = Flay.new(:mass => 1)
 
-    s = RubyParser.new.process <<-RUBY
+    s = Ruby18Parser.new.process <<-RUBY
       def x(n)
         if n % 2 == 0
           return n
@@ -124,7 +124,7 @@ class TestSexp < MiniTest::Unit::TestCase
 
     flay = Flay.new opts
 
-    s = RubyParser.new.process <<-RUBY
+    s = Ruby18Parser.new.process <<-RUBY
       class Dog
         def x
           return "Hello"

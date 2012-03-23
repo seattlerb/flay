@@ -5,6 +5,14 @@ require 'rubygems'
 require 'sexp_processor'
 require 'ruby_parser'
 
+class File
+  RUBY19 = "<3".respond_to? :encoding
+
+  class << self
+    alias :binread :read unless RUBY19
+  end
+end
+
 class Flay
   VERSION = '1.4.3'
 
@@ -162,7 +170,7 @@ class Flay
   end
 
   def process_rb file
-    RubyParser.new.process(File.read(file), file)
+    RubyParser.new.process(File.binread(file), file)
   end
 
   def process_sexp pt
