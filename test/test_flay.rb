@@ -63,9 +63,7 @@ class TestSexp < MiniTest::Unit::TestCase
       end
     RUBY
 
-    expected = [[:block],
-                # HACK [:defn],
-                [:scope]] # only ones big enough
+    expected = [] # only ones big enough
 
     flay.process_sexp s
 
@@ -87,14 +85,11 @@ class TestSexp < MiniTest::Unit::TestCase
       end
     RUBY
 
-    expected = [[:arglist, :arglist, :arglist],
-                [:block],
-                [:call, :call],
+    expected = [[:call, :call],
                 [:call],
                 [:if],
                 [:return],
-                [:return],
-                [:scope]]
+                [:return]]
 
     flay.process_sexp s
 
