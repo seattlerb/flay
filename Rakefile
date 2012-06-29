@@ -15,8 +15,8 @@ Hoe.spec 'flay' do
   self.rubyforge_name = 'seattlerb'
   self.flay_threshold = 250
 
-  extra_deps << ['sexp_processor', '~> 3.0']
-  extra_deps << ['ruby_parser',    '~> 2.0']
+  extra_deps << ['sexp_processor', '~> 4.0']
+  extra_deps << ['ruby_parser',    '~> 3.0']
 end
 
 # vim: syntax=ruby
