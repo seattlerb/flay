@@ -14,7 +14,7 @@ class File
 end
 
 class Flay
-  VERSION = '1.4.3'
+  VERSION = '2.0.0.b1'
 
   def self.default_options
     {

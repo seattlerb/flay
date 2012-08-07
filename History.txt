@@ -1,3 +1,18 @@
+=== 2.0.0.b1 / 2012-08-07
+
+* 2 major enhancements:
+
+  * Parses ruby 1.9! (still in beta)
+  * Moved Sexp#deep_each and Sexp#each_sexp to sexp_processor
+
+* 1 minor enhancements:
+
+  * Use File.binread (File.read in 1.8) to bypass encoding errors
+
+* 1 bug fix:
+
+  * Fixed failing tests against ruby_parser 3
+
 === 1.4.3 / 2011-08-10
 
 * 1 bug fix:
