@@ -27,10 +27,11 @@ braces vs do/end, etc are all ignored. Making this totally rad.
 
 * Editor integration (emacs, textmate, other contributions welcome).
 * Score sequence fragments (a;b;c;d;e) vs (b;c;d) etc.
+* Persistent DB for efficient cross-project flaying.
 
 == SYNOPSIS:
 
-  % flay -v ~/Work/svn/ruby/ruby_1_8/lib/cgi.rb
+  % flay -v --diff ~/Work/svn/ruby/ruby_1_8/lib/cgi.rb
   Processing /Users/ryan/Work/svn/ruby/ruby_1_8/lib/cgi.rb...
   
   Matches found in :defn (mass = 184)
@@ -72,6 +73,7 @@ braces vs do/end, etc are all ignored. Making this totally rad.
 
 * ruby_parser
 * sexp_processor
+* ruby2ruby -- soft dependency: only if you want to use --diff
 
 == INSTALL:
 
