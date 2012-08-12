@@ -6,10 +6,8 @@ require 'sexp_processor'
 require 'ruby_parser'
 
 class File
-  RUBY19 = "<3".respond_to? :encoding
-
   class << self
-    alias :binread :read unless RUBY19
+    alias :binread :read unless "<3".respond_to?(:encoding)
   end
 end
 
