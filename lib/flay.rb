@@ -4,6 +4,7 @@ require 'optparse'
 require 'rubygems'
 require 'sexp_processor'
 require 'ruby_parser'
+require 'timeout'
 
 class File
   RUBY19 = "<3".respond_to? :encoding
@@ -170,7 +171,11 @@ class Flay
   end
 
   def process_rb file
-    RubyParser.new.process(File.binread(file), file)
+    begin
+      RubyParser.new.process(File.binread(file), file)
+    rescue Timeout::Error
+      warn "TIMEOUT parsing #{file}. Skipping."
+    end
   end
 
   def process_sexp pt
