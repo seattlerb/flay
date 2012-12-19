@@ -18,7 +18,7 @@ Hoe.spec 'flay' do
   self.flay_threshold = 250
 
   dependency 'sexp_processor', '~> 4.0'
-  dependency 'ruby_parser',    '~> 3.0.0'
+  dependency 'ruby_parser',    '~> 3.0'
 end
 
 task :debug do
