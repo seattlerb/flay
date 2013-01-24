@@ -194,10 +194,8 @@ class Flay
     # extract all subtree hashes from all nodes
     all_hashes = {}
     self.hashes.values.each do |nodes|
-      nodes.each do |node|
-        node.all_structural_subhashes.each do |h|
-          all_hashes[h] = true
-        end
+      nodes.first.all_structural_subhashes.each do |h|
+        all_hashes[h] = true
       end
     end
 

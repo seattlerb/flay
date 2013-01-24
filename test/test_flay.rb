@@ -50,6 +50,23 @@ class TestSexp < MiniTest::Unit::TestCase
     assert_equal expected, x.sort.uniq
   end
 
+  def test_prune
+
+    contained = s(:a,s(:b,s(:c)))
+    container = s(:d,contained)
+
+    flay = Flay.new :mass => 0
+    flay.process_sexp s(:outer,contained)
+    2.times { flay.process_sexp s(:outer,container) }
+
+    assert_equal 3, flay.hashes[contained.structural_hash].length
+
+    flay.prune
+
+    refute flay.hashes.include? contained.structural_hash
+
+  end
+
   def test_process_sexp
     flay = Flay.new
 
