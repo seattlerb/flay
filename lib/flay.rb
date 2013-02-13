@@ -23,10 +23,11 @@ class Flay
       :mass    => 16,
       :summary => false,
       :verbose => false,
+      :timeout => 10,
     }
   end
 
-  def self.parse_options
+  def self.parse_options args = ARGV
     options = self.default_options
 
     OptionParser.new do |opts|
@@ -46,7 +47,8 @@ class Flay
         abort "--fuzzy is no longer supported. Sorry. It sucked."
       end
 
-      opts.on('-m', '--mass MASS', Integer, "Sets mass threshold") do |m|
+      opts.on('-m', '--mass MASS', Integer,
+              "Sets mass threshold (default = #{options[:mass]})") do |m|
         options[:mass] = m.to_i
       end
 
@@ -62,13 +64,23 @@ class Flay
         options[:summary] = true
       end
 
+      opts.on('-t', '--timeout TIME', Integer,
+              "Set the timeout. (default = #{options[:timeout]})") do |t|
+        options[:timeout] = t.to_i
+      end
+
       extensions = ['rb'] + Flay.load_plugins
 
       opts.separator ""
       opts.separator "Known extensions: #{extensions.join(', ')}"
 
+      extensions.each do |meth|
+        msg = "options_#{meth}"
+        send msg, opts, options if self.respond_to?(msg)
+      end
+
       begin
-        opts.parse!
+        opts.parse! args
       rescue => e
         abort "#{e}\n\n#{opts}"
       end
@@ -155,8 +167,6 @@ class Flay
         warn "  skipping #{file}: #{e.message}"
       end
     end
-
-    analyze
   end
 
   def analyze
@@ -172,7 +182,7 @@ class Flay
 
   def process_rb file
     begin
-      RubyParser.new.process(File.binread(file), file)
+      RubyParser.new.process(File.binread(file), file, option[:timeout])
     rescue Timeout::Error
       warn "TIMEOUT parsing #{file}. Skipping."
     end
@@ -251,6 +261,8 @@ class Flay
   end
 
   def report prune = nil
+    analyze
+
     puts "Total score (lower is better) = #{self.total}"
     puts
 
@@ -282,7 +294,7 @@ class Flay
       puts "%d) %s code found in %p (mass%s = %d)" %
         [count, match, node.first, bonus, mass]
 
-      nodes.each_with_index do |x, i|
+      nodes.sort_by { |x| [x.file, x.line] }.each_with_index do |x, i|
         if option[:diff] then
           c = (?A.ord + i).chr
           puts "  #{c}: #{x.file}:#{x.line}"
