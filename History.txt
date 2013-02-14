@@ -1,3 +1,13 @@
+=== 2.1.0 / 2013-02-13
+
+* 5 minor enhancements:
+
+  * Added --timeout option. Defaults to 10 seconds.
+  * Added ability for plugins to define options_<pluginname> method to extend options.
+  * Flay no longer defaults to '.' if no args given. Allows plugins to do more
+  * Moved #analyze down to #report. #process only processes, nothing more.
+  * Sort output for more stable reporting. Better for diffing against, my dear.
+
 === 2.0.1 / 2012-12-18
 
 * 2 bug fixes:
