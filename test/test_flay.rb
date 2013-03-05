@@ -50,22 +50,35 @@ class TestSexp < MiniTest::Unit::TestCase
     assert_equal expected, x.sort.uniq
   end
 
+  DOG_AND_CAT = Ruby18Parser.new.process <<-RUBY
+    class Dog
+      def x
+        return "Hello"
+      end
+    end
+    class Cat
+      def y
+        return "Hello"
+      end
+    end
+  RUBY
+
+  ROUND = Ruby18Parser.new.process <<-RUBY
+    def x(n)
+      if n % 2 == 0
+        return n
+      else
+        return n + 1
+      end
+    end
+  RUBY
+
   def test_process_sexp
     flay = Flay.new
 
-    s = Ruby18Parser.new.process <<-RUBY
-      def x(n)
-        if n % 2 == 0
-          return n
-        else
-          return n + 1
-        end
-      end
-    RUBY
-
     expected = [] # only ones big enough
 
-    flay.process_sexp s
+    flay.process_sexp ROUND.deep_clone
 
     actual = flay.hashes.values.map { |sexps| sexps.map { |sexp| sexp.first } }
 
@@ -75,23 +88,13 @@ class TestSexp < MiniTest::Unit::TestCase
   def test_process_sexp_full
     flay = Flay.new(:mass => 1)
 
-    s = Ruby18Parser.new.process <<-RUBY
-      def x(n)
-        if n % 2 == 0
-          return n
-        else
-          return n + 1
-        end
-      end
-    RUBY
-
     expected = [[:call, :call],
                 [:call],
                 [:if],
                 [:return],
                 [:return]]
 
-    flay.process_sexp s
+    flay.process_sexp ROUND.deep_clone
 
     actual = flay.hashes.values.map { |sexps| sexps.map { |sexp| sexp.first } }
 
@@ -119,20 +122,7 @@ class TestSexp < MiniTest::Unit::TestCase
 
     flay = Flay.new opts
 
-    s = Ruby18Parser.new.process <<-RUBY
-      class Dog
-        def x
-          return "Hello"
-        end
-      end
-      class Cat
-        def y
-          return "Hello"
-        end
-      end
-    RUBY
-
-    flay.process_sexp s
+    flay.process_sexp DOG_AND_CAT.deep_clone
     flay.analyze
 
     out, err = capture_io do
