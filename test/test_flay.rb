@@ -73,6 +73,42 @@ class TestSexp < MiniTest::Unit::TestCase
     end
   RUBY
 
+  def test_prune
+    contained = s(:a, s(:b,s(:c)), s(:d,s(:e)))
+    container = s(:d, contained)
+
+    flay = Flay.new :mass => 0
+    flay.process_sexp s(:outer,contained)
+    2.times { flay.process_sexp s(:outer,container) }
+
+    exp = [
+           [      s(:a, s(:b, s(:c)), s(:d, s(:e))),
+                  s(:a, s(:b, s(:c)), s(:d, s(:e))),
+                  s(:a, s(:b, s(:c)), s(:d, s(:e)))],
+           [            s(:b, s(:c)),
+                        s(:b, s(:c)),
+                        s(:b, s(:c))],
+           [s(:d, s(:a, s(:b, s(:c)), s(:d, s(:e)))),
+            s(:d, s(:a, s(:b, s(:c)), s(:d, s(:e))))],
+           [                          s(:d, s(:e)),
+                                      s(:d, s(:e)),
+                                      s(:d, s(:e))],
+          ]
+
+    assert_equal exp, flay.hashes.values.sort_by(&:inspect)
+
+    flay.prune
+
+    exp = [
+           [s(:d, s(:a, s(:b, s(:c)), s(:d, s(:e)))),
+            s(:d, s(:a, s(:b, s(:c)), s(:d, s(:e))))]
+          ]
+
+    assert_equal exp, flay.hashes.values.sort_by(&:inspect)
+
+    refute_includes flay.hashes, contained.structural_hash
+  end
+
   def test_process_sexp
     flay = Flay.new
 
