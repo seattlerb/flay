@@ -81,7 +81,8 @@ class TestSexp < MiniTest::Unit::TestCase
     flay.process_sexp s(:outer,contained)
     2.times { flay.process_sexp s(:outer,container) }
 
-    exp = [
+    exp = eval <<-EOM # just to prevent emacs from reindenting it
+          [
            [      s(:a, s(:b, s(:c)), s(:d, s(:e))),
                   s(:a, s(:b, s(:c)), s(:d, s(:e))),
                   s(:a, s(:b, s(:c)), s(:d, s(:e)))],
@@ -94,6 +95,7 @@ class TestSexp < MiniTest::Unit::TestCase
                                       s(:d, s(:e)),
                                       s(:d, s(:e))],
           ]
+    EOM
 
     assert_equal exp, flay.hashes.values.sort_by(&:inspect)
 
@@ -105,8 +107,6 @@ class TestSexp < MiniTest::Unit::TestCase
           ]
 
     assert_equal exp, flay.hashes.values.sort_by(&:inspect)
-
-    refute_includes flay.hashes, contained.structural_hash
   end
 
   def test_process_sexp
