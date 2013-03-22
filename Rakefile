@@ -25,10 +25,27 @@ task :debug do
   require "flay"
 
   file = ENV["F"]
+  mass = ENV["M"]
+  diff = ENV["D"]
+  libr = ENV["L"]
 
-  flay = Flay.new
+  opts = Flay.parse_options
+  opts[:mass] = mass.to_i if mass
+  opts[:diff] = diff.to_i if diff
+  opts[:liberal] = true if libr
+
+  flay = Flay.new opts
   flay.process(*Flay.expand_dirs_to_files(file))
   flay.report
+end
+
+task :run do
+  file = ENV["F"]
+  mass = ENV["M"] && "-m #{ENV["M"]}"
+  diff = ENV["D"] && "-d"
+  libr = ENV["L"] && "-l"
+
+  ruby "#{Hoe::RUBY_FLAGS} bin/flay #{mass} #{diff} #{libr} #{file}"
 end
 
 # vim: syntax=ruby
