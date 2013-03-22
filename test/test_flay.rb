@@ -24,6 +24,20 @@ class TestSexp < MiniTest::Unit::TestCase
     assert_equal hash, @s.deep_clone.structural_hash
   end
 
+  def test_delete_eql
+    s1 = s(:a, s(:b, s(:c)))
+    s2 = s(:a, s(:b, s(:c)))
+    s3 = s(:a, s(:b, s(:c)))
+
+    a1 = [s1, s2, s3]
+    a2 = [s1,     s3]
+
+    a1.delete_eql a2
+
+    assert_equal [s2], a1
+    assert_same s2, a1.first
+  end
+
   def test_all_structural_subhashes
     s = s(:iter,
           s(:call, s(:arglist, s(:lit))),
@@ -102,6 +116,45 @@ class TestSexp < MiniTest::Unit::TestCase
     flay.prune
 
     exp = [
+           [s(:d, s(:a, s(:b, s(:c)), s(:d, s(:e)))),
+            s(:d, s(:a, s(:b, s(:c)), s(:d, s(:e))))]
+          ]
+
+    assert_equal exp, flay.hashes.values.sort_by(&:inspect)
+  end
+
+  def test_prune_liberal
+    contained = s(:a, s(:b,s(:c)), s(:d,s(:e)))
+    container = s(:d, contained)
+
+    flay = Flay.new :mass => 0, :liberal => true
+    flay.process_sexp s(:outer,contained)
+    2.times { flay.process_sexp s(:outer,container) }
+
+    exp = eval <<-EOM # just to prevent emacs from reindenting it
+          [
+           [      s(:a, s(:b, s(:c)), s(:d, s(:e))),
+                  s(:a, s(:b, s(:c)), s(:d, s(:e))),
+                  s(:a, s(:b, s(:c)), s(:d, s(:e)))],
+           [            s(:b, s(:c)),
+                        s(:b, s(:c)),
+                        s(:b, s(:c))],
+           [s(:d, s(:a, s(:b, s(:c)), s(:d, s(:e)))),
+            s(:d, s(:a, s(:b, s(:c)), s(:d, s(:e))))],
+           [                          s(:d, s(:e)),
+                                      s(:d, s(:e)),
+                                      s(:d, s(:e))],
+          ]
+    EOM
+
+    assert_equal exp, flay.hashes.values.sort_by(&:inspect)
+
+    flay.prune
+
+    exp = [
+           [s(:a, s(:b, s(:c)), s(:d, s(:e))),
+            s(:a, s(:b, s(:c)), s(:d, s(:e))),
+            s(:a, s(:b, s(:c)), s(:d, s(:e)))],
            [s(:d, s(:a, s(:b, s(:c)), s(:d, s(:e)))),
             s(:d, s(:a, s(:b, s(:c)), s(:d, s(:e))))]
           ]

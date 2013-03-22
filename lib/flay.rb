@@ -24,6 +24,7 @@ class Flay
       :summary => false,
       :verbose => false,
       :timeout => 10,
+      :liberal => false,
     }
   end
 
@@ -45,6 +46,10 @@ class Flay
 
       opts.on('-f', '--fuzzy', "DEAD: fuzzy similarities.") do
         abort "--fuzzy is no longer supported. Sorry. It sucked."
+      end
+
+      opts.on('-l', '--liberal', "Use a more liberal detection method.") do
+        options[:liberal] = true
       end
 
       opts.on('-m', '--mass MASS', Integer,
@@ -174,6 +179,15 @@ class Flay
 
     self.hashes.each do |hash,nodes|
       identical[hash] = nodes[1..-1].all? { |n| n == nodes.first }
+    end
+
+    update_masses
+  end
+
+  def update_masses
+    self.total = 0
+    masses.clear
+    self.hashes.each do |hash, nodes|
       masses[hash] = nodes.first.mass * nodes.size
       masses[hash] *= (nodes.size) if identical[hash]
       self.total += masses[hash]
@@ -201,8 +215,15 @@ class Flay
     # prune trees that aren't duped at all, or are too small
     self.hashes.delete_if { |_,nodes| nodes.size == 1 }
 
-    # extract all subtree hashes from all nodes
+    return prune_liberally if option[:liberal]
+
+    prune_conservatively
+  end
+
+  def prune_conservatively
     all_hashes = {}
+
+    # extract all subtree hashes from all nodes
     self.hashes.values.each do |nodes|
       nodes.first.all_structural_subhashes.each do |h|
         all_hashes[h] = true
@@ -211,6 +232,37 @@ class Flay
 
     # nuke subtrees so we show the biggest matching tree possible
     self.hashes.delete_if { |h,_| all_hashes[h] }
+  end
+
+  def prune_liberally
+    update_masses
+
+    all_hashes = Hash.new { |h,k| h[k] = [] }
+
+    # record each subtree by subhash, but skip if subtree mass > parent mass
+    self.hashes.values.each do |nodes|
+      nodes.each do |node|
+        tophash  = node.structural_hash
+        topscore = self.masses[tophash]
+
+        node.deep_each do |subnode|
+          subhash  = subnode.structural_hash
+          subscore = self.masses[subhash]
+
+          next if subscore and subscore > topscore
+
+          all_hashes[subhash] << subnode
+        end
+      end
+    end
+
+    # nuke only individual items by object identity
+    self.hashes.each do |h,v|
+      v.delete_eql all_hashes[h]
+    end
+
+    # nuke buckets we happened to fully empty
+    self.hashes.delete_if { |k,v| v.size <= 1 }
   end
 
   def n_way_diff *data
@@ -274,7 +326,13 @@ class Flay
     end
 
     count = 0
-    masses.sort_by { |h,m| [-m, hashes[h].first.file] }.each do |hash, mass|
+    sorted = masses.sort_by { |h,m|
+      [-m,
+       hashes[h].first.file,
+       hashes[h].first.line,
+       hashes[h].first.first.to_s]
+    }
+    sorted.each do |hash, mass|
       nodes = hashes[hash]
       next unless nodes.first.first == prune if prune
       puts
@@ -325,5 +383,11 @@ class Sexp
       hashes << node.structural_hash
     end
     hashes
+  end
+end
+
+class Array
+  def delete_eql other
+    self.delete_if { |o1| other.any? { |o2| o1.equal? o2 } }
   end
 end
