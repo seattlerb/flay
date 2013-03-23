@@ -240,19 +240,17 @@ class Flay
     all_hashes = Hash.new { |h,k| h[k] = [] }
 
     # record each subtree by subhash, but skip if subtree mass > parent mass
-    self.hashes.values.each do |nodes|
-      nodes.each do |node|
-        tophash  = node.structural_hash
-        topscore = self.masses[tophash]
+    self.hashes.each do |tophash,nodes|
+      node = nodes.first
+      topscore = self.masses[tophash]
 
-        node.deep_each do |subnode|
-          subhash  = subnode.structural_hash
-          subscore = self.masses[subhash]
+      node.deep_each do |subnode|
+        subhash  = subnode.structural_hash
+        subscore = self.masses[subhash]
 
-          next if subscore and subscore > topscore
+        next if subscore and subscore > topscore
 
-          all_hashes[subhash] << subnode
-        end
+        all_hashes[subhash] << subnode
       end
     end
 
