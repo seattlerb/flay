@@ -221,23 +221,23 @@ class Flay
   end
 
   def prune_conservatively
-    all_hashes = {}
+    hashes_to_prune = {}
 
     # extract all subtree hashes from all nodes
     self.hashes.values.each do |nodes|
       nodes.first.all_structural_subhashes.each do |h|
-        all_hashes[h] = true
+        hashes_to_prune[h] = true
       end
     end
 
     # nuke subtrees so we show the biggest matching tree possible
-    self.hashes.delete_if { |h,_| all_hashes[h] }
+    self.hashes.delete_if { |h,_| hashes_to_prune[h] }
   end
 
   def prune_liberally
     update_masses
 
-    all_hashes = {}
+    hashes_to_prune = {}
 
     # record each subtree by subhash, but skip if subtree mass > parent mass
     self.hashes.each do |tophash,nodes|
@@ -250,11 +250,11 @@ class Flay
 
         next if subscore and subscore > topscore
 
-        all_hashes[subhash] = true
+        hashes_to_prune[subhash] = true
       end
     end
 
-    self.hashes.delete_if {|h,_| all_hashes[h] }
+    self.hashes.delete_if {|h,_| hashes_to_prune[h] }
 
   end
 
