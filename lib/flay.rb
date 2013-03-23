@@ -237,7 +237,7 @@ class Flay
   def prune_liberally
     update_masses
 
-    all_hashes = Hash.new { |h,k| h[k] = [] }
+    all_hashes = {}
 
     # record each subtree by subhash, but skip if subtree mass > parent mass
     self.hashes.each do |tophash,nodes|
@@ -250,17 +250,12 @@ class Flay
 
         next if subscore and subscore > topscore
 
-        all_hashes[subhash] << subnode
+        all_hashes[subhash] = true
       end
     end
 
-    # nuke only individual items by object identity
-    self.hashes.each do |h,v|
-      v.delete_eql all_hashes[h]
-    end
+    self.hashes.delete_if {|h,_| all_hashes[h] }
 
-    # nuke buckets we happened to fully empty
-    self.hashes.delete_if { |k,v| v.size <= 1 }
   end
 
   def n_way_diff *data
