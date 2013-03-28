@@ -20,6 +20,7 @@ braces vs do/end, etc are all ignored. Making this totally rad.
   * Add the flay-persistent plugin to work across large/many projects.
 * Run --diff to see an N-way diff of the code.
 * Provides conservative (default) and --liberal pruning options.
+* Provides --fuzzy duplication detection.
 * Language independent: Plugin system allows other languages to be flayed.
   * Ships with .rb and .erb. javascript and others will be available separately.
 * Includes FlayTask for Rakefiles.

@@ -25,6 +25,7 @@ class Flay
       :verbose => false,
       :timeout => 10,
       :liberal => false,
+      :fuzzy   => false,
     }
   end
 
@@ -44,8 +45,9 @@ class Flay
         exit
       end
 
-      opts.on('-f', '--fuzzy', "DEAD: fuzzy similarities.") do
-        abort "--fuzzy is no longer supported. Sorry. It sucked."
+      opts.on('-f', '--fuzzy [DIFF]', Integer,
+              "Detect fuzzy (copy & paste) duplication (default 1).") do |n|
+        options[:fuzzy] = n || 1
       end
 
       opts.on('-l', '--liberal', "Use a more liberal detection method.") do
@@ -208,12 +210,44 @@ class Flay
       next if node.mass < self.mass_threshold
 
       self.hashes[node.structural_hash] << node
+
+      process_fuzzy node, option[:fuzzy] if option[:fuzzy]
+    end
+  end
+
+  MAX_NODE_SIZE = 10 # prevents exponential blowout
+  MAX_AVG_MASS  = 12 # prevents exponential blowout
+
+  def process_fuzzy node, difference
+    return unless node.has_code?
+
+    avg_mass = node.mass / node.size
+    return if node.size > MAX_NODE_SIZE or avg_mass > MAX_AVG_MASS
+
+    tmpl, code = node.split_code
+    tmpl.modified = true
+
+    (code.size - 1).downto(code.size - difference) do |n|
+      code.combination(n).each do |subcode|
+        new_node = tmpl + subcode
+
+        next unless new_node.any? { |sub| Sexp === sub }
+        next if new_node.mass < self.mass_threshold
+
+        # they're already structurally similar, don't bother adding another
+        next if self.hashes[new_node.structural_hash].any? { |sub|
+          sub.file == new_node.file and sub.line == new_node.line
+        }
+
+        self.hashes[new_node.structural_hash] << new_node
+      end
     end
   end
 
   def prune
     # prune trees that aren't duped at all, or are too small
     self.hashes.delete_if { |_,nodes| nodes.size == 1 }
+    self.hashes.delete_if { |_,nodes| nodes.all?(&:modified?) }
 
     return prune_liberally if option[:liberal]
 
@@ -355,7 +389,8 @@ class Flay
           c = (?A.ord + i).chr
           puts "  #{c}: #{x.file}:#{x.line}"
         else
-          puts "  #{x.file}:#{x.line}"
+          extra = " (FUZZY)" if x.modified?
+          puts "  #{x.file}:#{x.line}#{extra}"
         end
       end
 
@@ -373,6 +408,9 @@ class String
 end
 
 class Sexp
+  attr_accessor :modified
+  alias :modified? :modified
+
   def structural_hash
     @structural_hash ||= self.structure.hash
   end
@@ -383,6 +421,50 @@ class Sexp
       hashes << node.structural_hash
     end
     hashes
+  end
+
+  def initialize_copy o
+    s = super
+    s.file = o.file
+    s.line = o.line
+    s.modified = o.modified
+    s
+  end
+
+  def [] a
+    s = super
+    if Sexp === s then
+      s.file = self.file
+      s.line = self.line
+      s.modified = self.modified
+    end
+    s
+  end
+
+  def + o
+    self.dup.concat o
+  end
+
+  def split_at n
+    return self[0..n], self[n+1..-1]
+  end
+
+  def code_index
+    {
+     :block  => 0,    # s(:block,                   *code)
+     :class  => 2,    # s(:class,      name, super, *code)
+     :module => 1,    # s(:module,     name,        *code)
+     :defn   => 2,    # s(:defn,       name, args,  *code)
+     :defs   => 3,    # s(:defs, recv, name, args,  *code)
+     :iter   => 2,    # s(:iter, recv,       args,  *code)
+    }[self.sexp_type]
+  end
+
+  alias has_code? code_index
+
+  def split_code
+    index = self.code_index
+    self.split_at index if index
   end
 end
 
