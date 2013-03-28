@@ -12,22 +12,22 @@ braces vs do/end, etc are all ignored. Making this totally rad.
 
 == FEATURES/PROBLEMS:
 
-* Plugin system allows other languages to be flayed.
-  * Ships with .rb and .erb. javascript and others will be available separately.
-* Includes FlayTask for Rakefiles.
+* Reports differences at any level of code.
+* Adds a score multiplier to identical nodes.
 * Differences in literal values, variable, class, and method names are ignored.
 * Differences in whitespace, programming style, braces vs do/end, etc are ignored.
 * Works across files.
-* Reports differences at any level of code.
+  * Add the flay-persistent plugin to work across large/many projects.
+* Run --diff to see an N-way diff of the code.
+* Provides conservative (default) and --liberal pruning options.
+* Language independent: Plugin system allows other languages to be flayed.
+  * Ships with .rb and .erb. javascript and others will be available separately.
+* Includes FlayTask for Rakefiles.
 * Totally rad.
-* Adds a score multiplier to identical nodes.
-* Run verbose to see an N-way diff of the code.
 
 == TODO:
 
 * Editor integration (emacs, textmate, other contributions welcome).
-* Score sequence fragments (a;b;c;d;e) vs (b;c;d) etc.
-* Persistent DB for efficient cross-project flaying.
 
 == SYNOPSIS:
 
