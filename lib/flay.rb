@@ -23,6 +23,7 @@ class Flay
       :mass    => 16,
       :summary => false,
       :verbose => false,
+      :number  => true,
       :timeout => 10,
       :liberal => false,
       :fuzzy   => false,
@@ -57,6 +58,10 @@ class Flay
       opts.on('-m', '--mass MASS', Integer,
               "Sets mass threshold (default = #{options[:mass]})") do |m|
         options[:mass] = m.to_i
+      end
+
+      opts.on('-#', "Don't number output (helps with diffs)") do |m|
+        options[:number] = false
       end
 
       opts.on('-v', '--verbose', "Verbose. Show progress processing files.") do
@@ -348,9 +353,9 @@ class Flay
     analyze
 
     puts "Total score (lower is better) = #{self.total}"
-    puts
 
     if option[:summary] then
+      puts
 
       self.summary.sort_by { |_,v| -v }.each do |file, score|
         puts "%8.2f: %s" % [score, file]
@@ -380,9 +385,15 @@ class Flay
                        ["Similar",   ""]
                      end
 
-      count += 1
-      puts "%d) %s code found in %p (mass%s = %d)" %
-        [count, match, node.first, bonus, mass]
+      if option[:number] then
+        count += 1
+
+        puts "%d) %s code found in %p (mass%s = %d)" %
+         [count, match, node.first, bonus, mass]
+      else
+        puts "%s code found in %p (mass%s = %d)" %
+         [match, node.first, bonus, mass]
+      end
 
       nodes.sort_by { |x| [x.file, x.line] }.each_with_index do |x, i|
         if option[:diff] then

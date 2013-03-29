@@ -221,7 +221,6 @@ class TestSexp < MiniTest::Unit::TestCase
     exp = <<-END.gsub(/\d+/, "N").gsub(/^ {6}/, "")
       Total score (lower is better) = 16
 
-
       1) Similar code found in :class (mass = 16)
         A: (string):1
         B: (string):6
