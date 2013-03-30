@@ -1,8 +1,27 @@
 class FlayTask < Rake::TaskLib
+  ##
+  # The name of the task. Defaults to :flay
+
   attr_accessor :name
+
+  ##
+  # What directories to operate on. Sensible defaults.
+
   attr_accessor :dirs
+
+  ##
+  # Threshold to fail the task at. Default 200.
+
   attr_accessor :threshold
+
+  ##
+  # Verbosity of output. Defaults to rake's trace (-t) option.
+
   attr_accessor :verbose
+
+  ##
+  # Creates a new FlayTask instance with given +name+, +threshold+,
+  # and +dirs+.
 
   def initialize name = :flay, threshold = 200, dirs = nil
     @name      = name
@@ -16,6 +35,9 @@ class FlayTask < Rake::TaskLib
 
     define
   end
+
+  ##
+  # Defines the flay task.
 
   def define
     desc "Analyze for code duplication in: #{dirs.join(', ')}"

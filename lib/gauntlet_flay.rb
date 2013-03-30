@@ -10,6 +10,7 @@ require 'flay'
 require 'gauntlet'
 require 'pp'
 
+# :stopdoc:
 class FlayGauntlet < Gauntlet
   $owners       = {}
   $score_file   = 'flay-scores.yml'
@@ -98,3 +99,4 @@ filter = Regexp.new filter if filter
 flayer = FlayGauntlet.new
 flayer.run_the_gauntlet filter
 flayer.display_report max
+# :startdoc:

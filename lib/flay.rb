@@ -7,7 +7,7 @@ require 'ruby_parser'
 require 'timeout'
 
 class File
-  RUBY19 = "<3".respond_to? :encoding unless defined? RUBY19
+  RUBY19 = "<3".respond_to? :encoding unless defined? RUBY19 # :nodoc:
 
   class << self
     alias :binread :read unless RUBY19
@@ -15,7 +15,10 @@ class File
 end
 
 class Flay
-  VERSION = '2.1.0'
+  VERSION = "2.1.0" # :nodoc:
+
+  ##
+  # Returns the default options.
 
   def self.default_options
     {
@@ -29,6 +32,9 @@ class Flay
       :fuzzy   => false,
     }
   end
+
+  ##
+  # Process options in +args+, defaulting to +ARGV+.
 
   def self.parse_options args = ARGV
     options = self.default_options
@@ -101,6 +107,11 @@ class Flay
     options
   end
 
+  ##
+  # Expands +*dirs+ to all files within that match ruby and rake extensions.
+  # --
+  # REFACTOR: from flog
+
   def self.expand_dirs_to_files *dirs
     extensions = ['rb'] + Flay.load_plugins
 
@@ -112,6 +123,9 @@ class Flay
       end
     }.flatten
   end
+
+  ##
+  # Loads all flay plugins. Files must be named "flog_*.rb".
 
   def self.load_plugins
     unless defined? @@plugins then
@@ -135,8 +149,13 @@ class Flay
     # ignore
   end
 
+  # :stopdoc:
   attr_accessor :mass_threshold, :total, :identical, :masses
   attr_reader :hashes, :option
+  # :startdoc:
+
+  ##
+  # Create a new instance of Flay with +option+s.
 
   def initialize option = nil
     @option = option || Flay.default_options
@@ -149,6 +168,9 @@ class Flay
 
     require 'ruby2ruby' if @option[:diff]
   end
+
+  ##
+  # Process any number of files.
 
   def process(*files) # TODO: rename from process - should act as SexpProcessor
     files.each do |file|
@@ -181,6 +203,9 @@ class Flay
     end
   end
 
+  ##
+  # Prune, find identical nodes, and update masses.
+
   def analyze
     self.prune
 
@@ -190,6 +215,9 @@ class Flay
 
     update_masses
   end
+
+  ##
+  # Reset total and recalculate the masses for all nodes in +hashes+.
 
   def update_masses
     self.total = 0
@@ -201,6 +229,12 @@ class Flay
     end
   end
 
+  ##
+  # Parse a ruby +file+ and return the sexp.
+  #
+  # --
+  # TODO: change the system and rename this to parse_rb.
+
   def process_rb file
     begin
       RubyParser.new.process(File.binread(file), file, option[:timeout])
@@ -208,6 +242,9 @@ class Flay
       warn "TIMEOUT parsing #{file}. Skipping."
     end
   end
+
+  ##
+  # Process a sexp +pt+.
 
   def process_sexp pt
     pt.deep_each do |node|
@@ -220,8 +257,14 @@ class Flay
     end
   end
 
+  # :stopdoc:
   MAX_NODE_SIZE = 10 # prevents exponential blowout
   MAX_AVG_MASS  = 12 # prevents exponential blowout
+  # :startdoc:
+
+  ##
+  # Process "fuzzy" matches for +node+. A fuzzy match is a subset of
+  # +node+ up to +difference+ elements less than the original.
 
   def process_fuzzy node, difference
     return unless node.has_code?
@@ -249,6 +292,10 @@ class Flay
     end
   end
 
+  ##
+  # Prunes nodes that aren't relevant to analysis or are already
+  # covered by another node.
+
   def prune
     # prune trees that aren't duped at all, or are too small
     self.hashes.delete_if { |_,nodes| nodes.size == 1 }
@@ -258,6 +305,10 @@ class Flay
 
     prune_conservatively
   end
+
+  ##
+  # Conservative prune. Remove any bucket that is known to contain a
+  # subnode element of a node in another bucket.
 
   def prune_conservatively
     all_hashes = {}
@@ -272,6 +323,10 @@ class Flay
     # nuke subtrees so we show the biggest matching tree possible
     self.hashes.delete_if { |h,_| all_hashes[h] }
   end
+
+  ##
+  # Liberal prune. Remove any _element_ from a bucket that is known to
+  # be a subnode of another node. Removed by identity.
 
   def prune_liberally
     update_masses
@@ -304,6 +359,10 @@ class Flay
     self.hashes.delete_if { |k,v| v.size <= 1 }
   end
 
+  ##
+  # Output an n-way diff from +data+. This is only used if --diff is
+  # given.
+
   def n_way_diff *data
     data.each_with_index do |s, i|
       c = (?A.ord + i).chr
@@ -335,6 +394,9 @@ class Flay
     groups.flatten.join("\n")
   end
 
+  ##
+  # Calculate summary scores on a per-file basis. For --summary.
+
   def summary
     score = Hash.new 0
 
@@ -348,6 +410,9 @@ class Flay
 
     score
   end
+
+  ##
+  # Output the report. Duh.
 
   def report prune = nil
     analyze
@@ -415,16 +480,27 @@ class Flay
 end
 
 class String
-  attr_accessor :group
+  attr_accessor :group # :nodoc:
 end
 
 class Sexp
+  ##
+  # Whether or not this sexp is a mutated/modified sexp.
+
   attr_accessor :modified
-  alias :modified? :modified
+  alias :modified? :modified # Is this sexp modified?
+
+  ##
+  # Calculate the structural hash for this sexp. Cached, so don't
+  # modify the sexp afterwards and expect it to be correct.
 
   def structural_hash
     @structural_hash ||= self.structure.hash
   end
+
+  ##
+  # Returns a list of structural hashes for all nodes (and sub-nodes)
+  # of this sexp.
 
   def all_structural_subhashes
     hashes = []
@@ -434,7 +510,7 @@ class Sexp
     hashes
   end
 
-  def initialize_copy o
+  def initialize_copy o # :nodoc:
     s = super
     s.file = o.file
     s.line = o.line
@@ -442,7 +518,7 @@ class Sexp
     s
   end
 
-  def [] a
+  def [] a # :nodoc:
     s = super
     if Sexp === s then
       s.file = self.file
@@ -452,13 +528,21 @@ class Sexp
     s
   end
 
-  def + o
+  def + o # :nodoc:
     self.dup.concat o
   end
+
+  ##
+  # Useful general array method that splits the array from 0..+n+ and
+  # the rest. Returns both sections.
 
   def split_at n
     return self[0..n], self[n+1..-1]
   end
+
+  ##
+  # Return the index of the last non-code element, or nil if this sexp
+  # is not a code-bearing node.
 
   def code_index
     {
@@ -471,7 +555,11 @@ class Sexp
     }[self.sexp_type]
   end
 
-  alias has_code? code_index
+  alias has_code? code_index # Does this sexp have a +*code+ section?
+
+  ##
+  # Split the sexp into front-matter and code-matter, returning both.
+  # See #code_index.
 
   def split_code
     index = self.code_index
@@ -479,7 +567,11 @@ class Sexp
   end
 end
 
-class Array
+class Array # :nodoc:
+
+  ##
+  # Delete anything in +self+ if they are identical to anything in +other+.
+
   def delete_eql other
     self.delete_if { |o1| other.any? { |o2| o1.equal? o2 } }
   end
