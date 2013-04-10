@@ -311,17 +311,17 @@ class Flay
   # subnode element of a node in another bucket.
 
   def prune_conservatively
-    all_hashes = {}
+    hashes_to_prune = {}
 
     # extract all subtree hashes from all nodes
     self.hashes.values.each do |nodes|
       nodes.first.all_structural_subhashes.each do |h|
-        all_hashes[h] = true
+        hashes_to_prune[h] = true
       end
     end
 
     # nuke subtrees so we show the biggest matching tree possible
-    self.hashes.delete_if { |h,_| all_hashes[h] }
+    self.hashes.delete_if { |h,_| hashes_to_prune[h] }
   end
 
   ##
@@ -331,32 +331,25 @@ class Flay
   def prune_liberally
     update_masses
 
-    all_hashes = Hash.new { |h,k| h[k] = [] }
+    hashes_to_prune = {}
 
     # record each subtree by subhash, but skip if subtree mass > parent mass
-    self.hashes.values.each do |nodes|
-      nodes.each do |node|
-        tophash  = node.structural_hash
-        topscore = self.masses[tophash]
+    self.hashes.each do |tophash,nodes|
+      node = nodes.first
+      topscore = self.masses[tophash]
 
-        node.deep_each do |subnode|
-          subhash  = subnode.structural_hash
-          subscore = self.masses[subhash]
+      node.deep_each do |subnode|
+        subhash  = subnode.structural_hash
+        subscore = self.masses[subhash]
 
-          next if subscore and subscore > topscore
+        next if subscore and subscore > topscore
 
-          all_hashes[subhash] << subnode
-        end
+        hashes_to_prune[subhash] = true
       end
     end
 
-    # nuke only individual items by object identity
-    self.hashes.each do |h,v|
-      v.delete_eql all_hashes[h]
-    end
+    self.hashes.delete_if {|h,_| hashes_to_prune[h] }
 
-    # nuke buckets we happened to fully empty
-    self.hashes.delete_if { |k,v| v.size <= 1 }
   end
 
   ##
