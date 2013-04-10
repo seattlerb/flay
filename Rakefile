@@ -41,11 +41,12 @@ end
 
 task :run do
   file = ENV["F"]
+  fuzz = ENV["Z"] && "-f #{ENV["Z"]}"
   mass = ENV["M"] && "-m #{ENV["M"]}"
   diff = ENV["D"] && "-d"
   libr = ENV["L"] && "-l"
 
-  ruby "#{Hoe::RUBY_FLAGS} bin/flay #{mass} #{diff} #{libr} #{file}"
+  ruby "#{Hoe::RUBY_FLAGS} bin/flay #{mass} #{fuzz} #{diff} #{libr} #{file}"
 end
 
 # vim: syntax=ruby
