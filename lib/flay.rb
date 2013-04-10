@@ -15,7 +15,7 @@ class File
 end
 
 class Flay
-  VERSION = "2.1.0" # :nodoc:
+  VERSION = "2.2.0" # :nodoc:
 
   ##
   # Returns the default options.

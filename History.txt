@@ -1,3 +1,28 @@
+=== 2.2.0 / 2013-04-09
+
+Semantic versioning doesn't take into account how AWESOME a release
+is. In this case, it severely falls short. I'd jump to 4.0 if I could.
+
+* 2 major enhancements:
+
+  * Added --fuzzy (ie copy, paste, & modify) duplication detection.
+  * Added --liberal, which changes the way prune works to identify more duplication.
+
+* 12 minor enhancements:
+
+  * Added -# to turn off item numbering. Helps with diffs to compare runs over time.
+  * Added Sexp#+.
+  * Added Sexp#code_index to specify where *code starts in some sexps.
+  * Added Sexp#has_code?.
+  * Added Sexp#initalize_copy to propagate file/line/modified info.
+  * Added Sexp#modified, #modified=, and #modified?.
+  * Added Sexp#split_at(n). (Something I've wanted in Array for ages).
+  * Added Sexp#split_code.
+  * Added mass and diff options to rake debug.
+  * Added rake run task w/ mass, diff, and liberal options
+  * Made report's sort more stable, so I can do better comparison runs.
+  * Wrapped Sexp#[] to propagate file/line/modified info.
+
 === 2.1.0 / 2013-02-13
 
 * 5 minor enhancements:
