@@ -463,7 +463,8 @@ class Flay
       nodes.sort_by { |x| [x.file, x.line] }.each_with_index do |x, i|
         if option[:diff] then
           c = (?A.ord + i).chr
-          puts "  #{c}: #{x.file}:#{x.line}"
+          extra = " (FUZZY)" if x.modified?
+          puts "  #{c}: #{x.file}:#{x.line}#{extra}"
         else
           extra = " (FUZZY)" if x.modified?
           puts "  #{x.file}:#{x.line}#{extra}"
