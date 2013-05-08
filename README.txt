@@ -22,7 +22,9 @@ braces vs do/end, etc are all ignored. Making this totally rad.
 * Provides conservative (default) and --liberal pruning options.
 * Provides --fuzzy duplication detection.
 * Language independent: Plugin system allows other languages to be flayed.
-  * Ships with .rb and .erb. javascript and others will be available separately.
+  * Ships with .rb and .erb. 
+  * .haml is available via flay_haml gem (please note that reported line numbers corerspond to compiled haml code, not the source)
+  * javascript and others will be available separately.
 * Includes FlayTask for Rakefiles.
 * Totally rad.
 
