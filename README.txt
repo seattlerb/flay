@@ -1,7 +1,7 @@
 = flay
 
 home :: http://ruby.sadi.st/
-repo :: https://github.com/seattlerb/flay
+code :: https://github.com/seattlerb/flay
 rdoc :: http://seattlerb.rubyforge.org/flay
 
 == DESCRIPTION:
