@@ -383,7 +383,7 @@ class Flay
   end
 
   def split_and_group ary # :nodoc:
-    ary.enum_with_index.map { |s, i|
+    ary.each_with_index.map { |s, i|
       c = (?A.ord + i).chr
       s.scan(/^.*/).map { |s2|
         s2.group = c
