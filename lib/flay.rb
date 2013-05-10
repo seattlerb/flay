@@ -364,34 +364,48 @@ class Flay
   # given.
 
   def n_way_diff *data
-    data.each_with_index do |s, i|
-      c = (?A.ord + i).chr
-      s.group = c
+    comments = []
+    codes    = []
+
+    split_and_group(data).each do |subdata|
+      n = subdata.find_index { |s| s !~ /^#/ }
+
+      comment, code = subdata[0..n-1], subdata[n..-1]
+
+      comments << comment
+      codes    << code
     end
 
-    max = data.map { |s| s.scan(/^.*/).size }.max
+    comments = collapse_and_label pad_with_empty_strings comments
+    codes    = collapse_and_label pad_with_empty_strings codes
 
-    data.map! { |s| # FIX: this is tarded, but I'm out of brain
-      c = s.group
-      s = s.scan(/^.*/)
-      s.push(*([""] * (max - s.size))) # pad
-      s.each do |o|
-        o.group = c
-      end
-      s
+    (comments + codes).flatten.join("\n")
+  end
+
+  def split_and_group ary # :nodoc:
+    ary.enum_with_index.map { |s, i|
+      c = (?A.ord + i).chr
+      s.scan(/^.*/).map { |s2|
+        s2.group = c
+        s2
+      }
     }
+  end
 
-    groups = data[0].zip(*data[1..-1])
-    groups.map! { |lines|
-      collapsed = lines.uniq
-      if collapsed.size == 1 then
+  def pad_with_empty_strings ary # :nodoc:
+    max = ary.map { |s| s.size }.max
+
+    ary.map { |a| a + ([""] * (max - a.size)) }
+  end
+
+  def collapse_and_label ary # :nodoc:
+    ary[0].zip(*ary[1..-1]).map { |lines|
+      if lines.uniq.size == 1 then
         "   #{lines.first}"
       else
-        # TODO: make r2r have a canonical mode (doesn't make 1-liners)
         lines.reject { |l| l.empty? }.map { |l| "#{l.group}: #{l}" }
       end
     }
-    groups.flatten.join("\n")
   end
 
   ##
