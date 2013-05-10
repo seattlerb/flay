@@ -1,3 +1,14 @@
+=== 2.3.0 / 2013-05-10
+
+* 2 minor enhancements:
+
+  * Refactored n_way_diff into split_and_group, collapse_and_label, and pad_with_empty_strings.
+  * n_way_diff now does leading comments separately from the code, to better align diffs.
+
+* 1 bug fix:
+
+  * Fixed code/home urls in readme/gem.
+
 === 2.2.0 / 2013-04-09
 
 Semantic versioning doesn't take into account how AWESOME a release
