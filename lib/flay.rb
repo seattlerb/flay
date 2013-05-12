@@ -15,7 +15,7 @@ class File
 end
 
 class Flay
-  VERSION = "2.2.0" # :nodoc:
+  VERSION = "2.3.0" # :nodoc:
 
   ##
   # Returns the default options.
@@ -311,17 +311,17 @@ class Flay
   # subnode element of a node in another bucket.
 
   def prune_conservatively
-    all_hashes = {}
+    hashes_to_prune = {}
 
     # extract all subtree hashes from all nodes
     self.hashes.values.each do |nodes|
       nodes.first.all_structural_subhashes.each do |h|
-        all_hashes[h] = true
+        hashes_to_prune[h] = true
       end
     end
 
     # nuke subtrees so we show the biggest matching tree possible
-    self.hashes.delete_if { |h,_| all_hashes[h] }
+    self.hashes.delete_if { |h,_| hashes_to_prune[h] }
   end
 
   ##
@@ -331,7 +331,7 @@ class Flay
   def prune_liberally
     update_masses
 
-    all_hashes = Hash.new { |h,k| h[k] = [] }
+    hashes_to_prune = Hash.new { |h,k| h[k] = [] }
 
     # record each subtree by subhash, but skip if subtree mass > parent mass
     self.hashes.values.each do |nodes|
@@ -345,14 +345,14 @@ class Flay
 
           next if subscore and subscore > topscore
 
-          all_hashes[subhash] << subnode
+          hashes_to_prune[subhash] << subnode
         end
       end
     end
 
     # nuke only individual items by object identity
     self.hashes.each do |h,v|
-      v.delete_eql all_hashes[h]
+      v.delete_eql hashes_to_prune[h]
     end
 
     # nuke buckets we happened to fully empty
@@ -364,34 +364,48 @@ class Flay
   # given.
 
   def n_way_diff *data
-    data.each_with_index do |s, i|
-      c = (?A.ord + i).chr
-      s.group = c
+    comments = []
+    codes    = []
+
+    split_and_group(data).each do |subdata|
+      n = subdata.find_index { |s| s !~ /^#/ }
+
+      comment, code = subdata[0..n-1], subdata[n..-1]
+
+      comments << comment
+      codes    << code
     end
 
-    max = data.map { |s| s.scan(/^.*/).size }.max
+    comments = collapse_and_label pad_with_empty_strings comments
+    codes    = collapse_and_label pad_with_empty_strings codes
 
-    data.map! { |s| # FIX: this is tarded, but I'm out of brain
-      c = s.group
-      s = s.scan(/^.*/)
-      s.push(*([""] * (max - s.size))) # pad
-      s.each do |o|
-        o.group = c
-      end
-      s
+    (comments + codes).flatten.join("\n")
+  end
+
+  def split_and_group ary # :nodoc:
+    ary.each_with_index.map { |s, i|
+      c = (?A.ord + i).chr
+      s.scan(/^.*/).map { |s2|
+        s2.group = c
+        s2
+      }
     }
+  end
 
-    groups = data[0].zip(*data[1..-1])
-    groups.map! { |lines|
-      collapsed = lines.uniq
-      if collapsed.size == 1 then
+  def pad_with_empty_strings ary # :nodoc:
+    max = ary.map { |s| s.size }.max
+
+    ary.map { |a| a + ([""] * (max - a.size)) }
+  end
+
+  def collapse_and_label ary # :nodoc:
+    ary[0].zip(*ary[1..-1]).map { |lines|
+      if lines.uniq.size == 1 then
         "   #{lines.first}"
       else
-        # TODO: make r2r have a canonical mode (doesn't make 1-liners)
         lines.reject { |l| l.empty? }.map { |l| "#{l.group}: #{l}" }
       end
     }
-    groups.flatten.join("\n")
   end
 
   ##

@@ -65,11 +65,21 @@ class TestSexp < MiniTest::Unit::TestCase
   end
 
   DOG_AND_CAT = Ruby18Parser.new.process <<-RUBY
+    ##
+    # I am a dog.
+
     class Dog
       def x
         return "Hello"
       end
     end
+
+    ##
+    # I
+    # am
+    # a
+    # cat.
+
     class Cat
       def y
         return "Hello"
@@ -200,6 +210,38 @@ class TestSexp < MiniTest::Unit::TestCase
   def test_report
     # make sure we run through options parser
     $*.clear
+    $* << "--mass=1"
+    $* << "-v"
+
+    opts = nil
+    capture_io do # ignored
+      opts = Flay.parse_options
+    end
+
+    flay = Flay.new opts
+
+    flay.process_sexp DOG_AND_CAT.deep_clone
+    flay.analyze
+
+    out, err = capture_io do
+      flay.report nil
+    end
+
+    exp = <<-END.gsub(/\d+/, "N").gsub(/^ {6}/, "")
+      Total score (lower is better) = 16
+
+      1) Similar code found in :class (mass = 16)
+        (string):1
+        (string):6
+    END
+
+    assert_equal '', err
+    assert_equal exp, out.gsub(/\d+/, "N")
+  end
+
+  def test_report_diff
+    # make sure we run through options parser
+    $*.clear
     $* << "-d"
     $* << "--mass=1"
     $* << "-v"
@@ -225,6 +267,13 @@ class TestSexp < MiniTest::Unit::TestCase
         A: (string):1
         B: (string):6
 
+         ##
+      A: # I am a dog.
+      B: # I
+      B: # am
+      B: # a
+      B: # cat.
+
       A: class Dog
       B: class Cat
       A:   def x
@@ -235,6 +284,108 @@ class TestSexp < MiniTest::Unit::TestCase
     END
 
     assert_equal '', err
-    assert_equal exp, out.gsub(/\d+/, "N")
+    assert_equal exp, out.gsub(/\d+/, "N").gsub(/^ {3}$/, "")
+  end
+
+  def test_n_way_diff
+    dog_and_cat = ["##\n# I am a dog.\n\nclass Dog\n  def x\n    return \"Hello\"\n  end\nend",
+                   "##\n# I\n#\n# am\n# a\n# cat.\n\nclass Cat\n  def y\n    return \"Hello\"\n  end\nend"]
+
+    flay = Flay.new
+
+    exp = <<-EOM.gsub(/\d+/, "N").gsub(/^ {6}/, "").chomp
+         ##
+      A: # I am a dog.
+      B: # I
+      B: #
+      B: # am
+      B: # a
+      B: # cat.
+
+      A: class Dog
+      B: class Cat
+      A:   def x
+      B:   def y
+             return \"Hello\"
+           end
+         end
+    EOM
+
+    assert_equal exp, flay.n_way_diff(*dog_and_cat).gsub(/^ {3}$/, "")
+  end
+
+  def test_split_and_group
+    flay = Flay.new
+
+    act = flay.split_and_group ["a\nb\nc", "d\ne\nf"]
+    exp = [%w(a b c), %w(d e f)]
+
+    assert_equal exp, act
+    assert_equal [%w(A A A), %w(B B B)], act.map { |a| a.map { |s| s.group } }
+  end
+
+  def test_pad_with_empty_strings
+    flay = Flay.new
+
+    a = %w(a b c)
+    b = %w(d)
+
+    assert_equal [a, ["d", "", ""]], flay.pad_with_empty_strings([a, b])
+  end
+
+  def test_pad_with_empty_strings_same
+    flay = Flay.new
+
+    a = %w(a b c)
+    b = %w(d e f)
+
+    assert_equal [a, b], flay.pad_with_empty_strings([a, b])
+  end
+
+  def test_collapse_and_label
+    flay = Flay.new
+
+    a = %w(a b c).map { |s| s.group = "A"; s }
+    b = %w(d b f).map { |s| s.group = "B"; s }
+
+    exp = [["A: a", "B: d"], "   b", ["A: c", "B: f"]]
+
+    assert_equal exp, flay.collapse_and_label([a, b])
+  end
+
+  def test_collapse_and_label_same
+    flay = Flay.new
+
+    a = %w(a b c).map { |s| s.group = "A"; s }
+    b = %w(a b c).map { |s| s.group = "B"; s }
+
+    exp = ["   a", "   b", "   c"]
+
+    assert_equal exp, flay.collapse_and_label([a, b])
+  end
+
+  def test_n_way_diff_methods
+    dog_and_cat = ["##\n# I am a dog.\n\ndef x\n  return \"Hello\"\nend",
+                   "##\n# I\n#\n# am\n# a\n# cat.\n\ndef y\n  return \"Hello\"\nend"]
+
+    opts = Flay.parse_options
+    flay = Flay.new opts
+
+    exp = <<-EOM.gsub(/\d+/, "N").gsub(/^ {6}/, "").chomp
+         ##
+      A: # I am a dog.
+      B: # I
+      B: #
+      B: # am
+      B: # a
+      B: # cat.
+
+      A: def x
+      B: def y
+           return \"Hello\"
+         end
+    EOM
+
+    assert_equal exp, flay.n_way_diff(*dog_and_cat).gsub(/^ {3}$/, "")
   end
 end

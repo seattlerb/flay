@@ -1,7 +1,7 @@
 = flay
 
 home :: http://ruby.sadi.st/
-repo :: https://github.com/seattlerb/flay
+code :: https://github.com/seattlerb/flay
 rdoc :: http://seattlerb.rubyforge.org/flay
 
 == DESCRIPTION:
@@ -22,11 +22,15 @@ braces vs do/end, etc are all ignored. Making this totally rad.
 * Provides conservative (default) and --liberal pruning options.
 * Provides --fuzzy duplication detection.
 * Language independent: Plugin system allows other languages to be flayed.
-  * Ships with .rb and .erb. 
-  * .haml is available via flay_haml gem (please note that reported line numbers corerspond to compiled haml code, not the source)
+  * Ships with .rb and .erb.
   * javascript and others will be available separately.
 * Includes FlayTask for Rakefiles.
 * Totally rad.
+
+== KNOWN EXTENSIONS:
+
+* flay-haml        :: Flay your HAML source.
+* flay-persistence :: Persist results across runs. Great for multi-project analysis.
 
 == TODO:
 
@@ -36,11 +40,11 @@ braces vs do/end, etc are all ignored. Making this totally rad.
 
   % flay -v --diff ~/Work/svn/ruby/ruby_1_8/lib/cgi.rb
   Processing /Users/ryan/Work/svn/ruby/ruby_1_8/lib/cgi.rb...
-  
+
   Matches found in :defn (mass = 184)
     A: /Users/ryan/Work/svn/ruby/ruby_1_8/lib/cgi.rb:1470
     B: /Users/ryan/Work/svn/ruby/ruby_1_8/lib/cgi.rb:1925
-  
+
   A: def checkbox_group(name = "", *values)
   B: def radio_group(name = "", *values)
        if name.kind_of?(Hash) then
@@ -62,11 +66,11 @@ braces vs do/end, etc are all ignored. Making this totally rad.
          end
        end.to_s
      end
-  
+
   IDENTICAL Matches found in :for (mass*2 = 144)
     A: /Users/ryan/Work/svn/ruby/ruby_1_8/lib/cgi.rb:2160
     B: /Users/ryan/Work/svn/ruby/ruby_1_8/lib/cgi.rb:2217
-  
+
      for element in ["HTML", "BODY", "P", "DT", "DD", "LI", "OPTION", "THEAD", "TFOOT", "TBODY", "COLGROUP", "TR", "TH", "TD", "HEAD"] do
        methods = (methods + (("          def #{element.downcase}(attributes = {})\n" + nO_element_def(element)) + "          end\n"))
      end
