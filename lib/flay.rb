@@ -374,8 +374,8 @@ class Flay
       comments << subdata[0..n-1] if n > 0
     end
 
-    comments = collapse_and_label pad_with_empty_strings comments unless comments.empty?
-    codes    = collapse_and_label pad_with_empty_strings codes unless comments.empty?
+    comments = collapse_and_label(pad_with_empty_strings(comments)) unless comments.empty?
+    codes    = collapse_and_label(pad_with_empty_strings(codes)) unless codes.empty?
 
     (comments + codes).flatten.join("\n")
   end
