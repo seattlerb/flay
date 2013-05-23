@@ -5,7 +5,7 @@ require 'flay'
 
 $: << "../../sexp_processor/dev/lib"
 
-class TestSexp < MiniTest::Unit::TestCase
+class TestSexp < Minitest::Test
   def setup
     # a(1) { |c| d }
     @s = s(:iter,
