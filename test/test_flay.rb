@@ -5,7 +5,7 @@ require 'flay'
 
 $: << "../../sexp_processor/dev/lib"
 
-class TestSexp < MiniTest::Unit::TestCase
+class TestSexp < Minitest::Test
   def setup
     # a(1) { |c| d }
     @s = s(:iter,
@@ -309,6 +309,44 @@ class TestSexp < MiniTest::Unit::TestCase
              return \"Hello\"
            end
          end
+    EOM
+
+    assert_equal exp, flay.n_way_diff(*dog_and_cat).gsub(/^ {3}$/, "")
+  end
+
+  def test_n_way_diff_no_comments
+    dog_and_cat = ["class Dog\n  def x\n    return \"Hello\"\n  end\nend",
+                   "class Cat\n  def y\n    return \"Hello\"\n  end\nend"]
+
+    flay = Flay.new
+
+    exp = <<-EOM.gsub(/\d+/, "N").gsub(/^ {6}/, "").chomp
+      A: class Dog
+      B: class Cat
+      A:   def x
+      B:   def y
+             return \"Hello\"
+           end
+         end
+    EOM
+
+    assert_equal exp, flay.n_way_diff(*dog_and_cat).gsub(/^ {3}$/, "")
+  end
+
+  def test_n_way_diff_no_code
+    dog_and_cat = ["##\n# I am a dog.",
+                   "##\n# I\n#\n# am\n# a\n# cat."]
+
+    flay = Flay.new
+
+    exp = <<-EOM.gsub(/\d+/, "N").gsub(/^ {6}/, "").chomp
+         ##
+      A: # I am a dog.
+      B: # I
+      B: #
+      B: # am
+      B: # a
+      B: # cat.
     EOM
 
     assert_equal exp, flay.n_way_diff(*dog_and_cat).gsub(/^ {3}$/, "")
