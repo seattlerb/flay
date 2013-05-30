@@ -369,15 +369,13 @@ class Flay
 
     split_and_group(data).each do |subdata|
       n = subdata.find_index { |s| s !~ /^#/ }
-
-      comment, code = subdata[0..n-1], subdata[n..-1]
-
-      comments << comment
-      codes    << code
+      
+      codes << subdata[n..-1] if n
+      comments << subdata[0..n-1] if n > 0
     end
 
-    comments = collapse_and_label pad_with_empty_strings comments
-    codes    = collapse_and_label pad_with_empty_strings codes
+    comments = collapse_and_label(pad_with_empty_strings(comments)) unless comments.empty?
+    codes    = collapse_and_label(pad_with_empty_strings(codes)) unless codes.empty?
 
     (comments + codes).flatten.join("\n")
   end
