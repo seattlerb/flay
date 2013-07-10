@@ -314,6 +314,25 @@ class TestSexp < Minitest::Test
     assert_equal exp, flay.n_way_diff(*dog_and_cat).gsub(/^ {3}$/, "")
   end
 
+  def test_n_way_diff_no_comments
+    dog_and_cat = ["class Dog\n  def x\n    return \"Hello\"\n  end\nend",
+                   "class Cat\n  def y\n    return \"Hello\"\n  end\nend"]
+
+    flay = Flay.new
+
+    exp = <<-EOM.gsub(/\d+/, "N").gsub(/^ {6}/, "").chomp
+      A: class Dog
+      B: class Cat
+      A:   def x
+      B:   def y
+             return \"Hello\"
+           end
+         end
+    EOM
+
+    assert_equal exp, flay.n_way_diff(*dog_and_cat).gsub(/^ {3}$/, "")
+  end
+
   def test_split_and_group
     flay = Flay.new
 

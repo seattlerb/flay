@@ -371,6 +371,7 @@ class Flay
       n = subdata.find_index { |s| s !~ /^#/ }
 
       comment, code = subdata[0..n-1], subdata[n..-1]
+      comment = [] if n == 0
 
       comments << comment
       codes    << code
