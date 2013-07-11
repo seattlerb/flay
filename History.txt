@@ -1,3 +1,9 @@
+=== 2.3.1 / 2013-07-11
+
+* 1 bug fix:
+
+  * Fixed --diff outputting twice if there are no comments. (kalenkov)
+
 === 2.3.0 / 2013-05-10
 
 * 2 minor enhancements:
