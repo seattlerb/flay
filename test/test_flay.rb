@@ -287,6 +287,47 @@ class TestSexp < Minitest::Test
     assert_equal exp, out.gsub(/\d+/, "N").gsub(/^ {3}$/, "")
   end
 
+  def test_report_diff_plugin_converter
+    # make sure we run through options parser
+    $*.clear
+    $* << "-d"
+    $* << "--mass=1"
+    $* << "-v"
+
+    opts = nil
+    capture_io do # ignored
+      opts = Flay.parse_options
+    end
+
+    flay = Flay.new opts
+
+    flay.process_sexp DOG_AND_CAT.deep_clone
+    flay.analyze
+
+    # (string) does not have extension, maps to :sexp_to_
+    Flay.send(:define_method, :sexp_to_){|s| "source code #{s.line}"}
+
+    out, err = capture_io do
+      flay.report nil
+    end
+
+    Flay.send(:remove_method, :sexp_to_)
+
+    exp = <<-END.gsub(/\d+/, "N").gsub(/^ {6}/, "")
+      Total score (lower is better) = 16
+
+      1) Similar code found in :class (mass = 16)
+        A: (string):1
+        B: (string):6
+
+      A: source code 1
+      B: source code 6
+    END
+
+    assert_equal '', err
+    assert_equal exp, out.gsub(/\d+/, "N").gsub(/^ {3}$/, "")
+  end
+
   def test_n_way_diff
     dog_and_cat = ["##\n# I am a dog.\n\nclass Dog\n  def x\n    return \"Hello\"\n  end\nend",
                    "##\n# I\n#\n# am\n# a\n# cat.\n\nclass Cat\n  def y\n    return \"Hello\"\n  end\nend"]
