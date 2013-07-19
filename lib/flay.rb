@@ -165,8 +165,6 @@ class Flay
     self.masses         = {}
     self.total          = 0
     self.mass_threshold = @option[:mass]
-
-    require 'ruby2ruby' if @option[:diff]
   end
 
   ##
@@ -488,10 +486,25 @@ class Flay
 
       if option[:diff] then
         puts
-        r2r = Ruby2Ruby.new
-        puts n_way_diff(*nodes.map { |s| r2r.process(s.deep_clone) })
+        sources = nodes.map do |s|
+          msg = "sexp_to_#{File.extname(s.file).sub(/./, '')}"
+          self.respond_to?(msg) ? self.send(msg, s) : sexp_to_rb(s)
+        end
+        puts n_way_diff(*sources)
       end
     end
+  end
+
+  private
+
+  def sexp_to_rb sexp
+    begin
+      require 'ruby2ruby'
+    rescue LoadError
+      return 'ruby2ruby is required for diff'
+    end
+    @r2r ||= Ruby2Ruby.new
+    @r2r.process sexp.deep_clone
   end
 end
 
