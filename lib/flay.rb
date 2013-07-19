@@ -165,14 +165,6 @@ class Flay
     self.masses         = {}
     self.total          = 0
     self.mass_threshold = @option[:mass]
-
-    if @option[:diff]
-      begin
-        require 'ruby2ruby'
-      rescue LoadError
-        warn "'gem install ruby2ruby' to allow diff for ruby files"
-      end
-    end
   end
 
   ##
@@ -506,7 +498,11 @@ class Flay
   private
 
   def sexp_to_rb sexp
-    return 'ruby2ruby is required for diff' unless defined? Ruby2Ruby
+    begin
+      require 'ruby2ruby'
+    rescue LoadError
+      return 'ruby2ruby is required for diff'
+    end
     @r2r ||= Ruby2Ruby.new
     @r2r.process sexp.deep_clone
   end
