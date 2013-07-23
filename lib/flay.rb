@@ -495,8 +495,6 @@ class Flay
     end
   end
 
-  private
-
   def sexp_to_rb sexp
     begin
       require 'ruby2ruby'
