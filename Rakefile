@@ -1,7 +1,7 @@
 # -*- ruby -*-
 
-require 'rubygems'
-require 'hoe'
+require "rubygems"
+require "hoe"
 
 Hoe::add_include_dirs("../../sexp_processor/dev/lib",
                       "../../ruby_parser/dev/lib",
@@ -11,14 +11,14 @@ Hoe::add_include_dirs("../../sexp_processor/dev/lib",
 
 Hoe.plugin :seattlerb
 
-Hoe.spec 'flay' do
-  developer 'Ryan Davis', 'ryand-ruby@zenspider.com'
+Hoe.spec "flay" do
+  developer "Ryan Davis", "ryand-ruby@zenspider.com"
+  license "MIT"
 
-  self.rubyforge_name = 'seattlerb'
+  dependency "sexp_processor", "~> 4.0"
+  dependency "ruby_parser",    "~> 3.0"
+
   self.flay_threshold = 250
-
-  dependency 'sexp_processor', '~> 4.0'
-  dependency 'ruby_parser',    '~> 3.0'
 end
 
 task :debug do
