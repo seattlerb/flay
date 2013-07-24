@@ -1,3 +1,9 @@
+=== 2.4.0 / 2013-07-24
+
+* 1 minor enhancement:
+
+  * Allow plugins to provide sexp to source converters for --diff. (UncleGene)
+
 === 2.3.1 / 2013-07-11
 
 * 1 bug fix:
