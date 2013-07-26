@@ -30,6 +30,7 @@ braces vs do/end, etc are all ignored. Making this totally rad.
 == KNOWN EXTENSIONS:
 
 * flay-actionpack  :: Use Rails ERB handler.
+* flay-js          :: Process JavaScript files.
 * flay-haml        :: Flay your HAML source.
 * flay-persistence :: Persist results across runs. Great for multi-project analysis.
 
