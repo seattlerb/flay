@@ -204,7 +204,7 @@ class Flay
   ##
   # Prune, find identical nodes, and update masses.
 
-  def analyze
+  def analyze prune = nil
     self.prune
 
     self.hashes.each do |hash,nodes|
@@ -212,6 +212,30 @@ class Flay
     end
 
     update_masses
+
+    sorted = masses.sort_by { |h,m|
+      [-m,
+       hashes[h].first.file,
+       hashes[h].first.line,
+       hashes[h].first.first.to_s]
+    }
+
+    sorted.map { |hash, mass|
+      nodes = hashes[hash]
+      next unless nodes.first.first == prune if prune
+
+      same  = identical[hash]
+      node  = nodes.first
+      n     = nodes.size
+      bonus = "*#{n}" if same
+
+      locs = nodes.sort_by { |x| [x.file, x.line] }.each_with_index.map { |x, i|
+        extra = :fuzzy if x.modified?
+        [x.file, x.line, extra].compact
+      }
+
+      [hash, node.first, bonus, mass, locs]
+    }.compact
   end
 
   ##
@@ -427,70 +451,47 @@ class Flay
   ##
   # Output the report. Duh.
 
-  def report prune = nil
-    analyze
+  def report prune = nil, io = $stdout
+    data = analyze prune
 
-    puts "Total score (lower is better) = #{self.total}"
+    io.puts "Total score (lower is better) = #{self.total}"
 
     if option[:summary] then
-      puts
+      io.puts
 
       self.summary.sort_by { |_,v| -v }.each do |file, score|
-        puts "%8.2f: %s" % [score, file]
+        io.puts "%8.2f: %s" % [score, file]
       end
 
       return
     end
 
-    count = 0
-    sorted = masses.sort_by { |h,m|
-      [-m,
-       hashes[h].first.file,
-       hashes[h].first.line,
-       hashes[h].first.first.to_s]
-    }
-    sorted.each do |hash, mass|
-      nodes = hashes[hash]
-      next unless nodes.first.first == prune if prune
-      puts
+    data.each_with_index do |(hash, node_type, bonus, mass, locs), count|
+      prefix = "%d) " % (count + 1) if option[:number]
 
-      same = identical[hash]
-      node = nodes.first
-      n = nodes.size
-      match, bonus = if same then
-                       ["IDENTICAL", "*#{n}"]
-                     else
-                       ["Similar",   ""]
-                     end
+      match = bonus ? "IDENTICAL" : "Similar"
 
-      if option[:number] then
-        count += 1
+      io.puts
+      io.puts "%s%s code found in %p (mass%s = %d)" %
+          [prefix, match, node_type, bonus, mass]
 
-        puts "%d) %s code found in %p (mass%s = %d)" %
-         [count, match, node.first, bonus, mass]
-      else
-        puts "%s code found in %p (mass%s = %d)" %
-         [match, node.first, bonus, mass]
-      end
-
-      nodes.sort_by { |x| [x.file, x.line] }.each_with_index do |x, i|
-        if option[:diff] then
-          c = (?A.ord + i).chr
-          extra = " (FUZZY)" if x.modified?
-          puts "  #{c}: #{x.file}:#{x.line}#{extra}"
-        else
-          extra = " (FUZZY)" if x.modified?
-          puts "  #{x.file}:#{x.line}#{extra}"
-        end
+      locs.each_with_index do |(file, line, fuzzy), i|
+        loc_prefix = "%s: " % (?A.ord + i).chr if option[:diff]
+        extra = " (FUZZY)" if fuzzy
+        io.puts "  %s%s:%d%s" % [loc_prefix, file, line, extra]
       end
 
       if option[:diff] then
-        puts
+        io.puts
+
+        nodes = hashes[hash]
+
         sources = nodes.map do |s|
           msg = "sexp_to_#{File.extname(s.file).sub(/./, '')}"
           self.respond_to?(msg) ? self.send(msg, s) : sexp_to_rb(s)
         end
-        puts n_way_diff(*sources)
+
+        io.puts n_way_diff(*sources)
       end
     end
   end

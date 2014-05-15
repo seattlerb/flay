@@ -20,8 +20,8 @@ class TestSexp < Minitest::Test
              s(:lasgn),
              s(:call, s(:arglist))).hash
 
-    assert_equal hash, @s.structural_hash
     assert_equal hash, @s.deep_clone.structural_hash
+    assert_equal hash, @s.structural_hash
   end
 
   def test_delete_eql
@@ -208,17 +208,7 @@ class TestSexp < Minitest::Test
   end
 
   def test_report
-    # make sure we run through options parser
-    $*.clear
-    $* << "--mass=1"
-    $* << "-v"
-
-    opts = nil
-    capture_io do # ignored
-      opts = Flay.parse_options
-    end
-
-    flay = Flay.new opts
+    flay = Flay.new Flay.parse_options %w[--mass=1 -v]
 
     flay.process_sexp DOG_AND_CAT.deep_clone
     flay.analyze
@@ -239,19 +229,27 @@ class TestSexp < Minitest::Test
     assert_equal exp, out.gsub(/\d+/, "N")
   end
 
+  def test_report_io
+    out = StringIO.new
+    flay = Flay.new Flay.parse_options %w[--mass=1 -v]
+
+    flay.process_sexp DOG_AND_CAT.deep_clone
+    flay.analyze
+    flay.report nil, out
+
+    exp = <<-END.gsub(/\d+/, "N").gsub(/^ {6}/, "")
+      Total score (lower is better) = 16
+
+      1) Similar code found in :class (mass = 16)
+        (string):1
+        (string):6
+    END
+
+    assert_equal exp, out.string.gsub(/\d+/, "N")
+  end
+
   def test_report_diff
-    # make sure we run through options parser
-    $*.clear
-    $* << "-d"
-    $* << "--mass=1"
-    $* << "-v"
-
-    opts = nil
-    capture_io do # ignored
-      opts = Flay.parse_options
-    end
-
-    flay = Flay.new opts
+    flay = Flay.new Flay.parse_options %w[-d --mass=1 -v]
 
     flay.process_sexp DOG_AND_CAT.deep_clone
     flay.analyze
@@ -288,18 +286,7 @@ class TestSexp < Minitest::Test
   end
 
   def test_report_diff_plugin_converter
-    # make sure we run through options parser
-    $*.clear
-    $* << "-d"
-    $* << "--mass=1"
-    $* << "-v"
-
-    opts = nil
-    capture_io do # ignored
-      opts = Flay.parse_options
-    end
-
-    flay = Flay.new opts
+    flay = Flay.new Flay.parse_options %w[-d --mass=1 -v]
 
     flay.process_sexp DOG_AND_CAT.deep_clone
     flay.analyze
