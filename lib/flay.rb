@@ -30,6 +30,7 @@ class Flay
       :timeout => 10,
       :liberal => false,
       :fuzzy   => false,
+      :only   => nil,
     }
   end
 
@@ -72,6 +73,10 @@ class Flay
 
       opts.on('-v', '--verbose', "Verbose. Show progress processing files.") do
         options[:verbose] = true
+      end
+
+      opts.on('-o', '--only NODE', String, "Only show matches on NODE type.") do |s|
+        options[:only] = s.to_sym
       end
 
       opts.on('-d', '--diff', "Diff Mode. Display N-Way diff for ruby.") do
@@ -204,7 +209,7 @@ class Flay
   ##
   # Prune, find identical nodes, and update masses.
 
-  def analyze prune = nil
+  def analyze filter = nil
     self.prune
 
     self.hashes.each do |hash,nodes|
@@ -222,7 +227,8 @@ class Flay
 
     sorted.map { |hash, mass|
       nodes = hashes[hash]
-      next unless nodes.first.first == prune if prune
+
+      next unless nodes.first.first == filter if filter
 
       same  = identical[hash]
       node  = nodes.first
@@ -451,8 +457,10 @@ class Flay
   ##
   # Output the report. Duh.
 
-  def report prune = nil, io = $stdout
-    data = analyze prune
+  def report io = $stdout
+    only = option[:only]
+
+    data = analyze only
 
     io.puts "Total score (lower is better) = #{self.total}"
 

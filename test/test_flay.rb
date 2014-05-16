@@ -214,7 +214,7 @@ class TestSexp < Minitest::Test
     flay.analyze
 
     out, err = capture_io do
-      flay.report nil
+      flay.report
     end
 
     exp = <<-END.gsub(/\d+/, "N").gsub(/^ {6}/, "")
@@ -235,7 +235,7 @@ class TestSexp < Minitest::Test
 
     flay.process_sexp DOG_AND_CAT.deep_clone
     flay.analyze
-    flay.report nil, out
+    flay.report out
 
     exp = <<-END.gsub(/\d+/, "N").gsub(/^ {6}/, "")
       Total score (lower is better) = 16
@@ -255,7 +255,7 @@ class TestSexp < Minitest::Test
     flay.analyze
 
     out, err = capture_io do
-      flay.report nil
+      flay.report
     end
 
     exp = <<-END.gsub(/\d+/, "N").gsub(/^ {6}/, "")
@@ -295,7 +295,7 @@ class TestSexp < Minitest::Test
     Flay.send(:define_method, :sexp_to_){|s| "source code #{s.line}"}
 
     out, err = capture_io do
-      flay.report nil
+      flay.report
     end
 
     Flay.send(:remove_method, :sexp_to_)
