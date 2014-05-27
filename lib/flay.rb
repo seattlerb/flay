@@ -17,6 +17,14 @@ end
 class Flay
   VERSION = "2.4.0" # :nodoc:
 
+  class Item < Struct.new(:structural_hash, :name, :bonus, :mass, :locations)
+    alias identical? bonus
+  end
+
+  class Location < Struct.new(:file, :line, :fuzzy)
+    alias fuzzy? fuzzy
+  end
+
   ##
   # Returns the default options.
 
@@ -237,10 +245,10 @@ class Flay
 
       locs = nodes.sort_by { |x| [x.file, x.line] }.each_with_index.map { |x, i|
         extra = :fuzzy if x.modified?
-        [x.file, x.line, extra].compact
+        Location[x.file, x.line, extra]
       }
 
-      [hash, node.first, bonus, mass, locs]
+      Item[hash, node.first, bonus, mass, locs]
     }.compact
   end
 
@@ -474,25 +482,25 @@ class Flay
       return
     end
 
-    data.each_with_index do |(hash, node_type, bonus, mass, locs), count|
+    data.each_with_index do |item, count|
       prefix = "%d) " % (count + 1) if option[:number]
 
-      match = bonus ? "IDENTICAL" : "Similar"
+      match = item.identical? ? "IDENTICAL" : "Similar"
 
       io.puts
       io.puts "%s%s code found in %p (mass%s = %d)" %
-          [prefix, match, node_type, bonus, mass]
+        [prefix, match, item.name, item.bonus, item.mass]
 
-      locs.each_with_index do |(file, line, fuzzy), i|
+      item.locations.each_with_index do |loc, i|
         loc_prefix = "%s: " % (?A.ord + i).chr if option[:diff]
-        extra = " (FUZZY)" if fuzzy
-        io.puts "  %s%s:%d%s" % [loc_prefix, file, line, extra]
+        extra = " (FUZZY)" if loc.fuzzy?
+        io.puts "  %s%s:%d%s" % [loc_prefix, loc.file, loc.line, extra]
       end
 
       if option[:diff] then
         io.puts
 
-        nodes = hashes[hash]
+        nodes = hashes[item.structural_hash]
 
         sources = nodes.map do |s|
           msg = "sexp_to_#{File.extname(s.file).sub(/./, '')}"
