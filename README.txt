@@ -38,7 +38,7 @@ braces vs do/end, etc are all ignored. Making this totally rad.
 
 * Editor integration (emacs, textmate, other contributions welcome).
 
-* Vim integration started, check it out: https://github.com/prophittcorey/vim-flay
+* Vim integration started (https://github.com/prophittcorey/vim-flay)
     - Flays the current file on save, load, or on command
 
 == SYNOPSIS:
