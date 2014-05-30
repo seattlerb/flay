@@ -1,3 +1,14 @@
+=== 2.5.0 / 2014-05-29
+
+* 6 minor enhancements:
+
+  * Added Flay::Item and Flay::Location to encapsulate analysis.
+  * Added `--only nodetype` filter flag.
+  * Flay#analyze now returns a nice data structure you can walk over.
+  * Flay#report is now much more dumb. :)
+  * Flay#report now takes an optional IO object.
+  * Removed unused prune arg in Flay#report.
+
 === 2.4.0 / 2013-07-24
 
 * 1 minor enhancement:
