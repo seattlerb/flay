@@ -28,11 +28,13 @@ task :debug do
   mass = ENV["M"]
   diff = ENV["D"]
   libr = ENV["L"]
+  ver  = ENV["V"]
 
   opts = Flay.parse_options
   opts[:mass] = mass.to_i if mass
   opts[:diff] = diff.to_i if diff
   opts[:liberal] = true if libr
+  opts[:verbose] = true if ver
 
   flay = Flay.new opts
   flay.process(*Flay.expand_dirs_to_files(file))
