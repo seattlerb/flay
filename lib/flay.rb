@@ -521,6 +521,10 @@ class Flay
     @r2r ||= Ruby2Ruby.new
     @r2r.process sexp.deep_clone
   end
+
+  def exit_code
+    hashes.size
+  end
 end
 
 class String

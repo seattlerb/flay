@@ -8,3 +8,5 @@ files = Flay.expand_dirs_to_files(*ARGV)
 
 flay.process(*files)
 flay.report
+
+exit flay.exit_code
