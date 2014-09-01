@@ -26,6 +26,7 @@ braces vs do/end, etc are all ignored. Making this totally rad.
   * javascript and others will be available separately.
 * Includes FlayTask for Rakefiles.
 * Totally rad.
+* Will read from a .flayignore file to determine which files or directories to not process (similar format to .gitignore)
 
 == KNOWN EXTENSIONS:
 
