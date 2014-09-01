@@ -2,6 +2,7 @@
 
 require 'minitest/autorun'
 require 'flay'
+require 'fileutils'
 
 $: << "../../sexp_processor/dev/lib"
 
@@ -434,5 +435,48 @@ class TestSexp < Minitest::Test
     EOM
 
     assert_equal exp, flay.n_way_diff(*dog_and_cat).gsub(/^ {3}$/, "")
+  end
+
+  def test_expand_dirs_to_files
+    dir = 'test/tmp'
+    FileUtils.mkdir_p(dir)
+    File.open(File.join(dir, 'dog_and_cat.rb'), 'w') {}
+
+    files = Flay.expand_dirs_to_files(dir)
+    assert !files.empty?
+  ensure
+    FileUtils.rm_r(dir)
+  end
+
+  def test_expand_dirs_to_files_with_ignore_directory
+    File.open(File.join('.flayignore'), 'w') do |file|
+      file.write('test/')
+    end
+
+    dir = 'test/tmp'
+    FileUtils.mkdir_p(dir)
+    File.open(File.join(dir, 'dog_and_cat.rb'), 'w') {}
+
+    files = Flay.expand_dirs_to_files(dir)
+    assert files.empty?
+  ensure
+    FileUtils.rm('.flayignore')
+    FileUtils.rm_r(dir)
+  end
+
+  def test_expand_dirs_to_files_with_ignore_file_wildcard
+    File.open(File.join('.flayignore'), 'w') do |file|
+      file.write('dog*.rb')
+    end
+
+    dir = 'test/tmp'
+    FileUtils.mkdir_p(dir)
+    File.open(File.join(dir, 'dog_and_cat.rb'), 'w') {}
+
+    files = Flay.expand_dirs_to_files(dir)
+    assert files.empty?
+  ensure
+    FileUtils.rm('.flayignore')
+    FileUtils.rm_r(dir)
   end
 end

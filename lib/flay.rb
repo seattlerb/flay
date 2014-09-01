@@ -128,13 +128,32 @@ class Flay
   def self.expand_dirs_to_files *dirs
     extensions = ['rb'] + Flay.load_plugins
 
-    dirs.flatten.map { |p|
+    files = dirs.flatten.map { |p|
       if File.directory? p then
         Dir[File.join(p, '**', "*.{#{extensions.join(',')}}")]
       else
         p
       end
     }.flatten
+
+    if File.exists?('.flayignore')
+      ignore_paths = File.read('.flayignore').split("\n")
+      ignore_dirs, ignore_files = ignore_paths.partition do |ignore|
+        ignore.include?('/')
+      end
+
+      files = files.reject do |file|
+        ignore_dirs.any? do |ignore_dir|
+          file =~ /^(\.\/)?#{ignore_dir}/
+        end
+      end.reject do |file|
+        ignore_files.any? do |ignore_file|
+          File.fnmatch?(ignore_file, File.basename(file))
+        end
+      end
+    end
+
+    files
   end
 
   ##
