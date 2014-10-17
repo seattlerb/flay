@@ -1,16 +1,20 @@
-= flay
+# flay
 
 home :: http://ruby.sadi.st/
+
 code :: https://github.com/seattlerb/flay
+
 rdoc :: http://seattlerb.rubyforge.org/flay
 
-== DESCRIPTION:
 
-Flay analyzes code for structural similarities. Differences in literal
-values, variable, class, method names, whitespace, programming style,
-braces vs do/end, etc are all ignored. Making this totally rad.
+## DESCRIPTION
 
-== FEATURES/PROBLEMS:
+Flay analyzes code for structural similarities.
+Differences in literal values, variable, class,
+method names, whitespace, programming style, braces vs do/end, etc are all ignored. Making this totally rad.
+
+
+## FEATURES/PROBLEMS
 
 * Reports differences at any level of code.
 * Adds a score multiplier to identical nodes.
@@ -27,23 +31,27 @@ braces vs do/end, etc are all ignored. Making this totally rad.
 * Includes FlayTask for Rakefiles.
 * Totally rad.
 
-== KNOWN EXTENSIONS:
+
+## KNOWN EXTENSIONS:
 
 * flay-actionpack  :: Use Rails ERB handler.
 * flay-js          :: Process JavaScript files.
 * flay-haml        :: Flay your HAML source.
 * flay-persistence :: Persist results across runs. Great for multi-project analysis.
 
-== TODO:
 
-* Editor integration (emacs, textmate, other contributions welcome).
+## TODO:
 
-* Vim integration started (https://github.com/prophittcorey/vim-flay)
-    - Flays the current file on save, load, or on command
+- Editor integration (emacs, textmate, other contributions welcome).
 
-== SYNOPSIS:
+- Vim integration started (https://github.com/prophittcorey/vim-flay)
+ - Flays the current file on save, load, or on command
 
+
+##SYNOPSIS
+```ruby
   % flay -v --diff ~/Work/svn/ruby/ruby_1_8/lib/cgi.rb
+
   Processing /Users/ryan/Work/svn/ruby/ruby_1_8/lib/cgi.rb...
 
   Matches found in :defn (mass = 184)
@@ -80,18 +88,22 @@ braces vs do/end, etc are all ignored. Making this totally rad.
        methods = (methods + (("          def #{element.downcase}(attributes = {})\n" + nO_element_def(element)) + "          end\n"))
      end
   ...
+```
 
-== REQUIREMENTS:
 
+## REQUIREMENTS
 * ruby_parser
 * sexp_processor
 * ruby2ruby -- soft dependency: only if you want to use --diff
 
-== INSTALL:
 
-* sudo gem install flay
+## INSTALL:
 
-== LICENSE:
+```shell
+sudo gem install flay
+```
+
+## LICENSE:
 
 (The MIT License)
 
