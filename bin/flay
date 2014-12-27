@@ -4,7 +4,7 @@ require 'flay'
 
 flay = Flay.new Flay.parse_options
 
-files = Flay.expand_dirs_to_files(*ARGV)
+files = Flay.filter_files Flay.expand_dirs_to_files(*ARGV)
 
 flay.process(*files)
 flay.report

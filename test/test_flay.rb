@@ -2,6 +2,7 @@
 
 require 'minitest/autorun'
 require 'flay'
+require "tmpdir"
 
 $: << "../../sexp_processor/dev/lib"
 
@@ -434,5 +435,47 @@ class TestSexp < Minitest::Test
     EOM
 
     assert_equal exp, flay.n_way_diff(*dog_and_cat).gsub(/^ {3}$/, "")
+  end
+
+  def test_cls_expand_dirs_to_files
+    Dir.mktmpdir do |dir|
+      Dir.chdir dir do
+        FileUtils.touch "dog_and_cat.rb"
+
+        files = Flay.expand_dirs_to_files "."
+        assert_equal %w[dog_and_cat.rb], files
+      end
+    end
+  end
+
+  def assert_filter_files exp, filter, files = %w[test/dog_and_cat.rb]
+    ignore = StringIO.new filter
+    act = Flay.filter_files files, ignore
+    assert_equal exp, act
+  end
+
+  def test_cls_filter_files_dir
+    assert_filter_files [], "test/"
+  end
+
+  def test_cls_filter_files_files
+    assert_filter_files [], "test/*.rb"
+
+    example = %w[test/file.rb test/sub/file.rb top/test/perf.rb]
+
+    assert_filter_files example[1..-1], "test/*.rb", example
+  end
+
+  def test_cls_filter_files_glob
+    assert_filter_files [], "test*"
+    assert_filter_files [], "test*", ["test/lib/woot.rb"]
+    assert_filter_files [], "*.rb"
+    assert_filter_files [], "*dog*.rb"
+  end
+
+  def test_cls_filter_files_glob_miss
+    miss = %w[test/dog_and_cat.rb]
+    assert_filter_files miss, "test"
+    assert_filter_files miss, "nope"
   end
 end

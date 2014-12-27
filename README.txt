@@ -25,6 +25,7 @@ braces vs do/end, etc are all ignored. Making this totally rad.
   * Ships with .rb and .erb.
   * javascript and others will be available separately.
 * Includes FlayTask for Rakefiles.
+* Skips files matched via patterns in .flayignore (subset format of .gitignore).
 * Totally rad.
 
 == KNOWN EXTENSIONS:
