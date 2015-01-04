@@ -1,8 +1,8 @@
 #!/usr/bin/ruby
 
-require 'rubygems'
-require 'flay'
-require 'erb'
+require "rubygems"
+require "flay"
+require "erb"
 
 class Flay
 

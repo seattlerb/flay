@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby -w
 
-require 'optparse'
-require 'rubygems'
-require 'sexp_processor'
-require 'ruby_parser'
-require 'timeout'
+require "optparse"
+require "rubygems"
+require "sexp_processor"
+require "ruby_parser"
+require "timeout"
 
 class File
   RUBY19 = "<3".respond_to? :encoding unless defined? RUBY19 # :nodoc:
@@ -49,61 +49,61 @@ class Flay
     options = self.default_options
 
     OptionParser.new do |opts|
-      opts.banner  = 'flay [options] files_or_dirs'
+      opts.banner  = "flay [options] files_or_dirs"
       opts.version = Flay::VERSION
 
       opts.separator ""
       opts.separator "Specific options:"
       opts.separator ""
 
-      opts.on('-h', '--help', 'Display this help.') do
+      opts.on("-h", "--help", "Display this help.") do
         puts opts
         exit
       end
 
-      opts.on('-f', '--fuzzy [DIFF]', Integer,
+      opts.on("-f", "--fuzzy [DIFF]", Integer,
               "Detect fuzzy (copy & paste) duplication (default 1).") do |n|
         options[:fuzzy] = n || 1
       end
 
-      opts.on('-l', '--liberal', "Use a more liberal detection method.") do
+      opts.on("-l", "--liberal", "Use a more liberal detection method.") do
         options[:liberal] = true
       end
 
-      opts.on('-m', '--mass MASS', Integer,
+      opts.on("-m", "--mass MASS", Integer,
               "Sets mass threshold (default = #{options[:mass]})") do |m|
         options[:mass] = m.to_i
       end
 
-      opts.on('-#', "Don't number output (helps with diffs)") do |m|
+      opts.on("-#", "Don't number output (helps with diffs)") do |m|
         options[:number] = false
       end
 
-      opts.on('-v', '--verbose', "Verbose. Show progress processing files.") do
+      opts.on("-v", "--verbose", "Verbose. Show progress processing files.") do
         options[:verbose] = true
       end
 
-      opts.on('-o', '--only NODE', String, "Only show matches on NODE type.") do |s|
+      opts.on("-o", "--only NODE", String, "Only show matches on NODE type.") do |s|
         options[:only] = s.to_sym
       end
 
-      opts.on('-d', '--diff', "Diff Mode. Display N-Way diff for ruby.") do
+      opts.on("-d", "--diff", "Diff Mode. Display N-Way diff for ruby.") do
         options[:diff] = true
       end
 
-      opts.on('-s', '--summary', "Summarize. Show flay score per file only.") do
+      opts.on("-s", "--summary", "Summarize. Show flay score per file only.") do
         options[:summary] = true
       end
 
-      opts.on('-t', '--timeout TIME', Integer,
+      opts.on("-t", "--timeout TIME", Integer,
               "Set the timeout. (default = #{options[:timeout]})") do |t|
         options[:timeout] = t.to_i
       end
 
-      extensions = ['rb'] + Flay.load_plugins
+      extensions = ["rb"] + Flay.load_plugins
 
       opts.separator ""
-      opts.separator "Known extensions: #{extensions.join(', ')}"
+      opts.separator "Known extensions: #{extensions.join(", ")}"
 
       extensions.each do |meth|
         msg = "options_#{meth}"
@@ -126,11 +126,11 @@ class Flay
   # REFACTOR: from flog
 
   def self.expand_dirs_to_files *dirs
-    extensions = ['rb'] + Flay.load_plugins
+    extensions = ["rb"] + Flay.load_plugins
 
     dirs.flatten.map { |p|
       if File.directory? p then
-        Dir[File.join(p, '**', "*.{#{extensions.join(',')}}")]
+        Dir[File.join(p, "**", "*.{#{extensions.join(",")}}")]
       else
         p
       end
@@ -183,7 +183,7 @@ class Flay
       plugins = Gem.find_files("flay_*.rb").reject { |p| p =~ /flay_task/ }
 
       plugins.each do |plugin|
-        plugin_name = File.basename(plugin, '.rb').sub(/^flay_/, '')
+        plugin_name = File.basename(plugin, ".rb").sub(/^flay_/, "")
         next if @@plugins.include? plugin_name
         begin
           load plugin
@@ -223,7 +223,7 @@ class Flay
     files.each do |file|
       warn "Processing #{file}" if option[:verbose]
 
-      ext = File.extname(file).sub(/^\./, '')
+      ext = File.extname(file).sub(/^\./, "")
       ext = "rb" if ext.nil? || ext.empty?
       msg = "process_#{ext}"
 
@@ -354,7 +354,7 @@ class Flay
         next unless new_node.any? { |sub| Sexp === sub }
         next if new_node.mass < self.mass_threshold
 
-        # they're already structurally similar, don't bother adding another
+        # they're already structurally similar, don"t bother adding another
         next if self.hashes[new_node.structural_hash].any? { |sub|
           sub.file == new_node.file and sub.line == new_node.line
         }
@@ -539,7 +539,7 @@ class Flay
         nodes = hashes[item.structural_hash]
 
         sources = nodes.map do |s|
-          msg = "sexp_to_#{File.extname(s.file).sub(/./, '')}"
+          msg = "sexp_to_#{File.extname(s.file).sub(/./, "")}"
           self.respond_to?(msg) ? self.send(msg, s) : sexp_to_rb(s)
         end
 
@@ -550,9 +550,9 @@ class Flay
 
   def sexp_to_rb sexp
     begin
-      require 'ruby2ruby'
+      require "ruby2ruby"
     rescue LoadError
-      return 'ruby2ruby is required for diff'
+      return "ruby2ruby is required for diff"
     end
     @r2r ||= Ruby2Ruby.new
     @r2r.process sexp.deep_clone

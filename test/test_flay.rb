@@ -1,7 +1,7 @@
 #!/usr/bin/ruby -w
 
-require 'minitest/autorun'
-require 'flay'
+require "minitest/autorun"
+require "flay"
 require "tmpdir"
 
 $: << "../../sexp_processor/dev/lib"
@@ -226,7 +226,7 @@ class TestSexp < Minitest::Test
         (string):6
     END
 
-    assert_equal '', err
+    assert_equal "", err
     assert_equal exp, out.gsub(/\d+/, "N")
   end
 
@@ -282,7 +282,7 @@ class TestSexp < Minitest::Test
          end
     END
 
-    assert_equal '', err
+    assert_equal "", err
     assert_equal exp, out.gsub(/\d+/, "N").gsub(/^ {3}$/, "")
   end
 
@@ -312,7 +312,7 @@ class TestSexp < Minitest::Test
       B: source code 6
     END
 
-    assert_equal '', err
+    assert_equal "", err
     assert_equal exp, out.gsub(/\d+/, "N").gsub(/^ {3}$/, "")
   end
 

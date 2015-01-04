@@ -40,7 +40,7 @@ class FlayTask < Rake::TaskLib
   # Defines the flay task.
 
   def define
-    desc "Analyze for code duplication in: #{dirs.join(', ')}"
+    desc "Analyze for code duplication in: #{dirs.join(", ")}"
     task name do
       require "flay"
       flay = Flay.new

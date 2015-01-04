@@ -1,24 +1,24 @@
 #!/usr/bin/ruby -ws
 
-$: << 'lib' << '../../ParseTree/dev/lib' << '../../flay/dev/lib'
+$: << "lib" << "../../ParseTree/dev/lib" << "../../flay/dev/lib"
 
 $v ||= false # HACK
 
-require 'rubygems'
-require 'flay'
+require "rubygems"
+require "flay"
 
-require 'gauntlet'
-require 'pp'
+require "gauntlet"
+require "pp"
 
 # :stopdoc:
 class FlayGauntlet < Gauntlet
   $owners       = {}
-  $score_file   = 'flay-scores.yml'
+  $score_file   = "flay-scores.yml"
   $misc_error   = {:total => -1, :average => -1, :methods => {}}
   $syntax_error = {:total => -2, :average => -2, :methods => {}}
   $no_gem       = {:total => -4, :average => -4, :methods => {}}
 
-  # copied straight from hoedown.rb 
+  # copied straight from hoedown.rb
   my_projects = %w[InlineFortran ParseTree RubyInline RubyToC
                    ZenHacks ZenTest bfts box_layout
                    change_class flay flog gauntlet heckle
@@ -31,7 +31,7 @@ class FlayGauntlet < Gauntlet
 
   def run name
     warn name
-    self.data[name] = score_for '.'
+    self.data[name] = score_for "."
     self.dirty = true
   end
 
