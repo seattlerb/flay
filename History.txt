@@ -1,3 +1,10 @@
+=== 2.6.0 / 2015-01-09
+
+* 2 minor enhancements:
+
+  * Added support for .flayignore files. (kcdragon)
+  * Added Flay.filter_files(files, ignore_path_or_io).
+
 === 2.5.0 / 2014-05-29
 
 * 6 minor enhancements:
