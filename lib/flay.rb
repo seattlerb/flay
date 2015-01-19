@@ -134,7 +134,7 @@ class Flay
       else
         p
       end
-    }.flatten.map { |s| s[/^(\.\/)?/] = ""; s } # strip "./" from paths
+    }.flatten.map { |s| s.sub(/^\.\//, "") } # strip "./" from paths
   end
 
   # so I can move this to flog wholesale
