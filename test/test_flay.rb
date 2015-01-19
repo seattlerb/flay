@@ -478,4 +478,10 @@ class TestSexp < Minitest::Test
     assert_filter_files miss, "test"
     assert_filter_files miss, "nope"
   end
+
+  def test_expand_dirs_on_frozen_string
+    s = "./foo"
+    s.freeze
+    assert_equal Flay.expand_dirs_to_files([s]), ["foo"]
+  end
 end
