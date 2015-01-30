@@ -1,3 +1,9 @@
+=== 2.6.1 / 2015-01-30
+
+* 1 bug fix:
+
+  * Fixed frozen string modification error on ruby 2.0+. (apiology)
+
 === 2.6.0 / 2015-01-09
 
 * 2 minor enhancements:
