@@ -2,7 +2,7 @@
 
 home :: http://ruby.sadi.st/
 code :: https://github.com/seattlerb/flay
-rdoc :: http://seattlerb.rubyforge.org/flay
+rdoc :: http://docs.seattlerb.org/flay/
 
 == DESCRIPTION:
 
