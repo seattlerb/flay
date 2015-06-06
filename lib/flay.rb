@@ -174,7 +174,7 @@ class Flay
   end
 
   ##
-  # Loads all flay plugins. Files must be named "flog_*.rb".
+  # Loads all flay plugins. Files must be named "flay_*.rb".
 
   def self.load_plugins
     unless defined? @@plugins then
