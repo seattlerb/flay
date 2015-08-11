@@ -1,16 +1,22 @@
-= flay
+##flay
 
-home :: http://ruby.sadi.st/
-code :: https://github.com/seattlerb/flay
-rdoc :: http://docs.seattlerb.org/flay/
+<a style="text-decoration: none;" href="http://ruby.sadi.st/">
+	<button class="button-save large" style="background:#5ba4e5;color:#fff; text-decoration: none; box-shadow: none; border-radius: 0.5rem; line-height: 16px; border-style: none; padding: 1em 1.8em; font-size: 14px; cursor: pointer; margin-right: 5%" href="http://ruby.sadi.st/">Home</button>
+</a>
+<a style="text-decoration:none;" href="https://github.com/seattlerb/flay">
+	<button class="button-save large" style="background:#5ba4e5;color:#fff; text-decoration: none; box-shadow: none; border-radius: 0.5rem; line-height: 16px; border-style: none; padding: 1em 1.8em; font-size: 14px; margin-right: 5%">Code</button>
+</a>
+<a style="text-decoration:none;" href="http://docs.seattlerb.org/flay/">
+	<button class="button-save large" style="background:#5ba4e5;color:#fff; text-decoration: none; box-shadow: none; border-radius: 0.5rem; line-height: 16px; border-style: none; padding: 1em 1.8em; font-size: 14px;">Home</button>
+</a>  
 
-== DESCRIPTION:
+####DESCRIPTION:
 
 Flay analyzes code for structural similarities. Differences in literal
 values, variable, class, method names, whitespace, programming style,
-braces vs do/end, etc are all ignored. Making this totally rad.
+braces vs do/end, etc are all ignored. Making this **totally rad**.
 
-== FEATURES/PROBLEMS:
+####FEATURES/PROBLEMS:
 
 * Reports differences at any level of code.
 * Adds a score multiplier to identical nodes.
@@ -28,71 +34,71 @@ braces vs do/end, etc are all ignored. Making this totally rad.
 * Skips files matched via patterns in .flayignore (subset format of .gitignore).
 * Totally rad.
 
-== KNOWN EXTENSIONS:
+####KNOWN EXTENSIONS:
 
 * flay-actionpack  :: Use Rails ERB handler.
 * flay-js          :: Process JavaScript files.
 * flay-haml        :: Flay your HAML source.
 * flay-persistence :: Persist results across runs. Great for multi-project analysis.
 
-== TODO:
+####TODO:
 
 * Editor integration (emacs, textmate, other contributions welcome).
 
 * Vim integration started (https://github.com/prophittcorey/vim-flay)
     - Flays the current file on save, load, or on command
 
-== SYNOPSIS:
+####SYNOPSIS:
 
-  % flay -v --diff ~/Work/svn/ruby/ruby_1_8/lib/cgi.rb
-  Processing /Users/ryan/Work/svn/ruby/ruby_1_8/lib/cgi.rb...
+      % flay -v --diff ~/Work/svn/ruby/ruby_1_8/lib/cgi.rb
+      Processing /Users/ryan/Work/svn/ruby/ruby_1_8/lib/cgi.rb...
+      
 
-  Matches found in :defn (mass = 184)
-    A: /Users/ryan/Work/svn/ruby/ruby_1_8/lib/cgi.rb:1470
-    B: /Users/ryan/Work/svn/ruby/ruby_1_8/lib/cgi.rb:1925
+	  Matches found in :defn (mass = 184)
+	     A: /Users/ryan/Work/svn/ruby/ruby_1_8/lib/cgi.rb:1470
+	    B: /Users/ryan/Work/svn/ruby/ruby_1_8/lib/cgi.rb:1925
 
-  A: def checkbox_group(name = "", *values)
-  B: def radio_group(name = "", *values)
-       if name.kind_of?(Hash) then
-         values = name["VALUES"]
-         name = name["NAME"]
-       end
-       values.collect do |value|
-         if value.kind_of?(String) then
-  A:       (checkbox(name, value) + value)
-  B:       (radio_button(name, value) + value)
-         else
-           if (value[(value.size - 1)] == true) then
-  A:         (checkbox(name, value[0], true) + value[(value.size - 2)])
-  B:         (radio_button(name, value[0], true) + value[(value.size - 2)])
-           else
-  A:         (checkbox(name, value[0]) + value[(value.size - 1)])
-  B:         (radio_button(name, value[0]) + value[(value.size - 1)])
-           end
-         end
-       end.to_s
-     end
-
-  IDENTICAL Matches found in :for (mass*2 = 144)
-    A: /Users/ryan/Work/svn/ruby/ruby_1_8/lib/cgi.rb:2160
-    B: /Users/ryan/Work/svn/ruby/ruby_1_8/lib/cgi.rb:2217
+	  A: def checkbox_group(name = "", *values)
+	  B: def radio_group(name = "", *values)
+	       if name.kind_of?(Hash) then
+	         values = name["VALUES"]
+	         name = name["NAME"]
+	       end
+	       values.collect do |value|
+	         if value.kind_of?(String) then
+	  A:       (checkbox(name, value) + value)
+	  B:       (radio_button(name, value) + value)
+	         else
+	           if (value[(value.size - 1)] == true) then
+	  A:         (checkbox(name, value[0], true) + value[(value.size - 2)])
+	  B:         (radio_button(name, value[0], true) + value[(value.size - 2)])
+	           else
+	  A:         (checkbox(name, value[0]) + value[(value.size - 1)])
+	  B:         (radio_button(name, value[0]) + value[(value.size - 1)])
+	           end
+	         end
+	       end.to_s
+	     end
+	
+	  IDENTICAL Matches found in :for (mass*2 = 144)
+	    A: /Users/ryan/Work/svn/ruby/ruby_1_8/lib/cgi.rb:2160
+	    B: /Users/ryan/Work/svn/ruby/ruby_1_8/lib/cgi.rb:2217
 
      for element in ["HTML", "BODY", "P", "DT", "DD", "LI", "OPTION", "THEAD", "TFOOT", "TBODY", "COLGROUP", "TR", "TH", "TD", "HEAD"] do
        methods = (methods + (("          def #{element.downcase}(attributes = {})\n" + nO_element_def(element)) + "          end\n"))
      end
-  ...
 
-== REQUIREMENTS:
+####REQUIREMENTS:
 
 * ruby_parser
 * sexp_processor
 * ruby2ruby -- soft dependency: only if you want to use --diff
 
-== INSTALL:
+####INSTALL:
 
-* sudo gem install flay
+	sudo gem install flay
 
-== LICENSE:
+####LICENSE:
 
 (The MIT License)
 
