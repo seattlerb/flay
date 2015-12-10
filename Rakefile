@@ -10,6 +10,7 @@ Hoe::add_include_dirs("../../sexp_processor/dev/lib",
                       "lib")
 
 Hoe.plugin :seattlerb
+Hoe.plugin :isolate
 
 Hoe.spec "flay" do
   developer "Ryan Davis", "ryand-ruby@zenspider.com"
@@ -17,11 +18,12 @@ Hoe.spec "flay" do
 
   dependency "sexp_processor", "~> 4.0"
   dependency "ruby_parser",    "~> 3.0"
+  dependency "erubis",         "~> 2.7.0"
 
   self.flay_threshold = 250
 end
 
-task :debug do
+task :debug => :isolate do
   require "flay"
 
   file = ENV["F"]
