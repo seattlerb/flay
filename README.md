@@ -1,16 +1,16 @@
-= flay
+# flay
 
 home :: http://ruby.sadi.st/
 code :: https://github.com/seattlerb/flay
 rdoc :: http://docs.seattlerb.org/flay/
 
-== DESCRIPTION:
+## DESCRIPTION:
 
 Flay analyzes code for structural similarities. Differences in literal
 values, variable, class, method names, whitespace, programming style,
 braces vs do/end, etc are all ignored. Making this totally rad.
 
-== FEATURES/PROBLEMS:
+## FEATURES/PROBLEMS:
 
 * Reports differences at any level of code.
 * Adds a score multiplier to identical nodes.
@@ -28,23 +28,24 @@ braces vs do/end, etc are all ignored. Making this totally rad.
 * Skips files matched via patterns in .flayignore (subset format of .gitignore).
 * Totally rad.
 
-== KNOWN EXTENSIONS:
+## KNOWN EXTENSIONS:
 
 * flay-actionpack  :: Use Rails ERB handler.
 * flay-js          :: Process JavaScript files.
 * flay-haml        :: Flay your HAML source.
 * flay-persistence :: Persist results across runs. Great for multi-project analysis.
 
-== TODO:
+## TODO:
 
 * Editor integration (emacs, textmate, other contributions welcome).
 
 * Vim integration started (https://github.com/prophittcorey/vim-flay)
     - Flays the current file on save, load, or on command
 
-== SYNOPSIS:
+## SYNOPSIS:
 
-  % flay -v --diff ~/Work/svn/ruby/ruby_1_8/lib/cgi.rb
+  ```
+  flay -v --diff ~/Work/svn/ruby/ruby_1_8/lib/cgi.rb
   Processing /Users/ryan/Work/svn/ruby/ruby_1_8/lib/cgi.rb...
 
   Matches found in :defn (mass = 184)
@@ -80,19 +81,19 @@ braces vs do/end, etc are all ignored. Making this totally rad.
      for element in ["HTML", "BODY", "P", "DT", "DD", "LI", "OPTION", "THEAD", "TFOOT", "TBODY", "COLGROUP", "TR", "TH", "TD", "HEAD"] do
        methods = (methods + (("          def #{element.downcase}(attributes = {})\n" + nO_element_def(element)) + "          end\n"))
      end
-  ...
+  ```
 
-== REQUIREMENTS:
+## REQUIREMENTS:
 
 * ruby_parser
 * sexp_processor
-* ruby2ruby -- soft dependency: only if you want to use --diff
+* ruby2ruby -- soft dependency: only if you want to use `--diff`
 
-== INSTALL:
+## INSTALL:
 
-* sudo gem install flay
+* `sudo gem install flay`
 
-== LICENSE:
+## LICENSE:
 
 (The MIT License)
 
