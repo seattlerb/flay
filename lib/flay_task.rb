@@ -1,3 +1,5 @@
+require 'rake/tasklib'
+
 class FlayTask < Rake::TaskLib
   ##
   # The name of the task. Defaults to :flay
