@@ -11,6 +11,7 @@ Hoe::add_include_dirs("../../sexp_processor/dev/lib",
 
 Hoe.plugin :seattlerb
 Hoe.plugin :isolate
+Hoe.plugin :bundler
 
 Hoe.spec "flay" do
   developer "Ryan Davis", "ryand-ruby@zenspider.com"
@@ -19,6 +20,9 @@ Hoe.spec "flay" do
   dependency "sexp_processor", "~> 4.0"
   dependency "ruby_parser",    "~> 3.0"
   dependency "erubis",         "~> 2.7.0"
+
+  dependency "minitest",       "~> 5.8.0", :dev
+  dependency "ruby2ruby",      "~> 2.2.0", :dev
 
   self.flay_threshold = 250
 end
