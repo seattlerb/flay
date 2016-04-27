@@ -5,6 +5,7 @@ require "rubygems"
 require "sexp_processor"
 require "ruby_parser"
 require "timeout"
+require "json"
 
 class File
   RUBY19 = "<3".respond_to? :encoding unless defined? RUBY19 # :nodoc:
@@ -39,6 +40,7 @@ class Flay
       :liberal => false,
       :fuzzy   => false,
       :only   => nil,
+      :format   => false
     }
   end
 
@@ -98,6 +100,10 @@ class Flay
       opts.on("-t", "--timeout TIME", Integer,
               "Set the timeout. (default = #{options[:timeout]})") do |t|
         options[:timeout] = t.to_i
+      end
+
+      opts.on("-f", "--format", "Format report as json") do
+        options[:format] = true
       end
 
       extensions = ["rb"] + Flay.load_plugins
@@ -498,17 +504,76 @@ class Flay
     score
   end
 
-  ##
-  # Output the report. Duh.
+  def report_json io, data
+    json = {}
+    json[:total] = self.total
+    clones = []
 
-  def report io = $stdout
-    only = option[:only]
+    if option[:summary]
+      summary = []
+      self.summary.sort_by { |_,v| -v }.each do |file, score|
+        file_json = {}
+        file_json[:score] = "%8.2f" % [score]
+        file_json[:filename] = "%s" % [file]
+        summary.push(file_json)
+      end
+      json[:summary] = summary
+    else
+      data.each_with_index do |item, count|
+        clone = {}
+        prefix = "%d" % (count + 1) if option[:number]
+        clone[:prefix] = prefix
 
-    data = analyze only
+        match = item.identical? ? "IDENTICAL" : "Similar"
+        clone[:match] = match
 
+        clone[:mass] = item.mass
+        clone[:bonus] = item.bonus unless item.bonus.nil?
+        clone[:name] = item.name
+        files = []
+
+        item.locations.each_with_index do |loc, i|
+          file = {}
+
+          extra = "FUZZY" if loc.fuzzy?
+
+          file[:filename] = loc.file
+          file[:line] = loc.line
+          file[:extra] = extra unless extra.nil?
+
+          if option[:diff] then
+            nodes = hashes[item.structural_hash]
+            node = nodes[i]
+
+            source = begin
+              msg = "sexp_to_#{File.extname(node.file).sub(/./, "")}"
+              self.respond_to?(msg) ? self.send(msg, node) : sexp_to_rb(node)
+            end
+
+            contents = []
+            contents.push(source)
+            file[:contents] = contents
+          end
+
+          files.push(file)
+        end
+
+        clone[:files] = files
+
+        clones.push(clone)
+
+        json[:clones] = clones
+
+      end
+    end
+
+    io.puts json.to_json
+  end
+
+  def report_io io, data
     io.puts "Total score (lower is better) = #{self.total}"
 
-    if option[:summary] then
+    if option[:summary]
       io.puts
 
       self.summary.sort_by { |_,v| -v }.each do |file, score|
@@ -525,7 +590,7 @@ class Flay
 
       io.puts
       io.puts "%s%s code found in %p (mass%s = %d)" %
-        [prefix, match, item.name, item.bonus, item.mass]
+                  [prefix, match, item.name, item.bonus, item.mass]
 
       item.locations.each_with_index do |loc, i|
         loc_prefix = "%s: " % (?A.ord + i).chr if option[:diff]
@@ -545,6 +610,21 @@ class Flay
 
         io.puts n_way_diff(*sources)
       end
+    end
+  end
+
+  ##
+  # Output the report. Duh.
+
+  def report io = $stdout
+    only = option[:only]
+
+    data = analyze only
+
+    if option[:format]
+      report_json(io,data)
+    else
+      report_io(io,data)
     end
   end
 
