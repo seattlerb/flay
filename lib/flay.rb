@@ -40,7 +40,7 @@ class Flay
       :liberal => false,
       :fuzzy   => false,
       :only   => nil,
-      :format   => false
+      :report   => false
     }
   end
 
@@ -102,8 +102,8 @@ class Flay
         options[:timeout] = t.to_i
       end
 
-      opts.on("-f", "--format", "Format report as json") do
-        options[:format] = true
+      opts.on("-r", "--report", "Format report as json") do
+        options[:report] = true
       end
 
       extensions = ["rb"] + Flay.load_plugins
@@ -621,7 +621,7 @@ class Flay
 
     data = analyze only
 
-    if option[:format]
+    if option[:report]
       report_json(io,data)
     else
       report_io(io,data)
