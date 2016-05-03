@@ -530,9 +530,7 @@ class Flay
               self.respond_to?(msg) ? self.send(msg, node) : sexp_to_rb(node)
             end
 
-            contents = []
-            contents.push(source)
-            file[:contents] = contents
+            file[:contents] = source.split("\n")
           end
 
           files.push(file)
