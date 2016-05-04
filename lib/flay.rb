@@ -38,7 +38,8 @@ class Flay
       :timeout => 10,
       :liberal => false,
       :fuzzy   => false,
-      :only   => nil,
+      :only    => nil,
+      :report  => false
     }
   end
 
@@ -98,6 +99,10 @@ class Flay
       opts.on("-t", "--timeout TIME", Integer,
               "Set the timeout. (default = #{options[:timeout]})") do |t|
         options[:timeout] = t.to_i
+      end
+
+      opts.on("-r", "--report", "Format report as json") do
+        options[:report] = true
       end
 
       extensions = ["rb"] + Flay.load_plugins
