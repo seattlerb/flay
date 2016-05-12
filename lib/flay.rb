@@ -164,9 +164,10 @@ class Flay
 
       only_paths = File::FNM_PATHNAME
       files = files.reject { |f|
-        dirs.any?     { |i| File.fnmatch?(i, File.dirname(f), only_paths) } ||
-          globs.any?  { |i| File.fnmatch?(i, f) } ||
-          ifiles.any? { |i| File.fnmatch?(i, f, only_paths) }
+        f = File.expand_path(f)
+        dirs.any?     { |i| File.fnmatch?(File.expand_path(i), File.dirname(f), only_paths) } ||
+          globs.any?  { |i| File.fnmatch?(File.expand_path(i), f) } ||
+          ifiles.any? { |i| File.fnmatch?(File.expand_path(i), f, only_paths) }
       }
     end
 
