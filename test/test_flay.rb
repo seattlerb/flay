@@ -454,16 +454,25 @@ class TestSexp < Minitest::Test
     assert_equal exp, act
   end
 
+  def assert_filter_files_absolute_paths exp, filter, files = [File.join(Dir.pwd, 'test/dog_and_cat.rb')]
+    assert_filter_files exp, filter, files
+  end
+
   def test_cls_filter_files_dir
     assert_filter_files [], "test/"
+
+    assert_filter_files_absolute_paths [], "test/"
   end
 
   def test_cls_filter_files_files
-    assert_filter_files [], "test/*.rb"
-
     example = %w[test/file.rb test/sub/file.rb top/test/perf.rb]
+    example_absolute_paths = example.map { |e| File.join(Dir.pwd, e) }
 
+    assert_filter_files [], "test/*.rb"
     assert_filter_files example[1..-1], "test/*.rb", example
+
+    assert_filter_files_absolute_paths [], "test/*.rb"
+    assert_filter_files_absolute_paths example_absolute_paths[1..-1], "test/*.rb", example_absolute_paths
   end
 
   def test_cls_filter_files_glob
@@ -471,12 +480,22 @@ class TestSexp < Minitest::Test
     assert_filter_files [], "test*", ["test/lib/woot.rb"]
     assert_filter_files [], "*.rb"
     assert_filter_files [], "*dog*.rb"
+
+    assert_filter_files_absolute_paths [], "test*"
+    assert_filter_files_absolute_paths [], "test*", [File.join(Dir.pwd, "test/lib/woot.rb")]
+    assert_filter_files_absolute_paths [], "*.rb"
+    assert_filter_files_absolute_paths [], "*dog*.rb"
   end
 
   def test_cls_filter_files_glob_miss
     miss = %w[test/dog_and_cat.rb]
+    miss_absolute = [File.join(Dir.pwd, 'test/dog_and_cat.rb')]
+
     assert_filter_files miss, "test"
     assert_filter_files miss, "nope"
+
+    assert_filter_files_absolute_paths miss_absolute, "test"
+    assert_filter_files_absolute_paths miss_absolute, "nope"
   end
 
   def test_expand_dirs_on_frozen_string
