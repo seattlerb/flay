@@ -78,13 +78,9 @@ class FlayGauntlet < Gauntlet
   ############################################################
 
   def score_for dir
-    # files = `find #{dir} -name \\*.rb | grep -v gen.*templ`.split(/\n/)
-    flayer = Flay.new
-
     dirs = %w(app lib test spec).reject { |f| ! File.directory? f }
 
-    flay = Flay.new
-    flay.process(*Flay.expand_dirs_to_files(dirs))
+    flay = Flay.run dirs
     flay.total
   rescue Interrupt
     # let us break out

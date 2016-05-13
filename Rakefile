@@ -7,6 +7,7 @@ Hoe::add_include_dirs("../../sexp_processor/dev/lib",
                       "../../ruby_parser/dev/lib",
                       "../../ruby2ruby/dev/lib",
                       "../../ZenTest/dev/lib",
+                      "../../path_expander/dev/lib",
                       "lib")
 
 Hoe.plugin :seattlerb
@@ -20,6 +21,7 @@ Hoe.spec "flay" do
   dependency "sexp_processor", "~> 4.0"
   dependency "ruby_parser",    "~> 3.0"
   dependency "erubis",         "~> 2.7.0"
+  dependency "path_expander",  "~> 1.0"
 
   dependency "minitest",       "~> 5.8.0", :dev
   dependency "ruby2ruby",      "~> 2.2.0", :dev
@@ -31,30 +33,14 @@ task :debug => :isolate do
   require "flay"
 
   file = ENV["F"]
-  mass = ENV["M"]
-  diff = ENV["D"]
-  libr = ENV["L"]
-  ver  = ENV["V"]
+  fuzz = ENV["Z"] && ["-f", ENV["Z"]]
+  mass = ENV["M"] && ["-m", ENV["M"]]
+  diff = ENV["D"] && ["-d"]
+  libr = ENV["L"] && ["-l"]
+  ver  = ENV["V"] && ["-v"]
 
-  opts = Flay.parse_options
-  opts[:mass] = mass.to_i if mass
-  opts[:diff] = diff.to_i if diff
-  opts[:liberal] = true if libr
-  opts[:verbose] = true if ver
-
-  flay = Flay.new opts
-  flay.process(*Flay.expand_dirs_to_files(file))
+  flay = Flay.run [mass, fuzz, diff, libr, file, ver].flatten.compact
   flay.report
-end
-
-task :run do
-  file = ENV["F"]
-  fuzz = ENV["Z"] && "-f #{ENV["Z"]}"
-  mass = ENV["M"] && "-m #{ENV["M"]}"
-  diff = ENV["D"] && "-d"
-  libr = ENV["L"] && "-l"
-
-  ruby "#{Hoe::RUBY_FLAGS} bin/flay #{mass} #{fuzz} #{diff} #{libr} #{file}"
 end
 
 # vim: syntax=ruby
