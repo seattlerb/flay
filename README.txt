@@ -25,6 +25,10 @@ braces vs do/end, etc are all ignored. Making this totally rad.
   * Ships with .rb and .erb.
   * javascript and others will be available separately.
 * Includes FlayTask for Rakefiles.
+* Uses path_expander, so you can use:
+  * dir_arg -- expand a directory automatically
+  * @file_of_args -- persist arguments in a file
+  * -path_to_subtract -- ignore intersecting subsets of files/directories
 * Skips files matched via patterns in .flayignore (subset format of .gitignore).
 * Totally rad.
 
@@ -86,6 +90,7 @@ braces vs do/end, etc are all ignored. Making this totally rad.
 
 * ruby_parser
 * sexp_processor
+* path_expander
 * ruby2ruby -- soft dependency: only if you want to use --diff
 
 == INSTALL:
