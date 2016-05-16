@@ -1,3 +1,14 @@
+=== 2.8.0 / 2016-05-16
+
+* 1 minor enhancement:
+
+  * Switched to path_expander to deal with cmdline args. See path_expander for details.
+
+* 2 bug fixes:
+
+  * Added dev deps and bundler plugin to make flavorjones happy. (flavorjones)
+  * Explictly require rake/tasklib in flay_task.rb. (jasonkarns)
+
 === 2.7.0 / 2016-01-21
 
 * 1 minor enhancement:
