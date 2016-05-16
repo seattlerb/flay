@@ -27,14 +27,13 @@ class Flay
   end
 
   def self.run args = ARGV
-    flay = Flay.new Flay.parse_options args
-
     extensions = ["rb"] + Flay.load_plugins
     glob = "**/*.{#{extensions.join ","}}"
 
     expander = PathExpander.new args, glob
     files = expander.filter_files expander.process, DEFAULT_IGNORE
 
+    flay = Flay.new Flay.parse_options args
     flay.process(*files)
     flay
   end
