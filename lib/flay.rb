@@ -5,6 +5,7 @@ require "rubygems"
 require "sexp_processor"
 require "ruby_parser"
 require "timeout"
+require "checkstyle_xml_report_generator"
 
 class File
   RUBY19 = "<3".respond_to? :encoding unless defined? RUBY19 # :nodoc:
@@ -30,16 +31,16 @@ class Flay
 
   def self.default_options
     {
-      :diff    => false,
-      :mass    => 16,
-      :summary => false,
-      :verbose => false,
-      :number  => true,
-      :timeout => 10,
-      :liberal => false,
-      :fuzzy   => false,
-      :only    => nil,
-      :report  => false
+      :diff           => false,
+      :mass           => 16,
+      :summary        => false,
+      :verbose        => false,
+      :number         => true,
+      :timeout        => 10,
+      :liberal        => false,
+      :fuzzy          => false,
+      :only           => nil,
+      :xml_checkstyle => nil
     }
   end
 
@@ -101,8 +102,8 @@ class Flay
         options[:timeout] = t.to_i
       end
 
-      opts.on("-r", "--report", "Format report as json") do
-        options[:report] = true
+      opts.on("-x", "--xml-checkstyle PATH", String, "Generate checkstyle XML report.") do |path|
+        options[:xml_checkstyle] = path
       end
 
       extensions = ["rb"] + Flay.load_plugins
@@ -503,14 +504,14 @@ class Flay
     score
   end
 
-  ##
-  # Output the report. Duh.
+  def report_checkstyle_xml io, data
+    report = CheckstyleXmlReportGenerator.new(data).render
 
-  def report io = $stdout
-    only = option[:only]
+    File.write option[:xml_checkstyle], report
+    io.puts report
+  end
 
-    data = analyze only
-
+  def report_io io, data
     io.puts "Total score (lower is better) = #{self.total}"
 
     if option[:summary] then
@@ -550,6 +551,21 @@ class Flay
 
         io.puts n_way_diff(*sources)
       end
+    end
+  end
+
+  ##
+  # Output the report. Duh.
+
+  def report io = $stdout
+    only = option[:only]
+
+    data = analyze only
+
+    if option[:xml_checkstyle]
+      report_checkstyle_xml(io, data)
+    else
+      report_io(io, data)
     end
   end
 
