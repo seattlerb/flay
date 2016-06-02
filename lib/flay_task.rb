@@ -44,6 +44,7 @@ class FlayTask < Rake::TaskLib
   def define
     desc "Analyze for code duplication in: #{dirs.join(", ")}"
     task name do
+      require "flay"
       flay = Flay.run
       flay.report if verbose
 
