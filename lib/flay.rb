@@ -509,7 +509,7 @@ class Flay
     json[:total] = self.total
     clones = []
 
-    if option[:summary]
+    if option[:summary] then
       summary = []
       self.summary.sort_by { |_,v| -v }.each do |file, score|
         file_json = {}
@@ -571,7 +571,7 @@ class Flay
   def report_io io, data
     io.puts "Total score (lower is better) = #{self.total}"
 
-    if option[:summary]
+    if option[:summary] then
       io.puts
 
       self.summary.sort_by { |_,v| -v }.each do |file, score|
@@ -588,7 +588,7 @@ class Flay
 
       io.puts
       io.puts "%s%s code found in %p (mass%s = %d)" %
-                  [prefix, match, item.name, item.bonus, item.mass]
+      [prefix, match, item.name, item.bonus, item.mass]
 
       item.locations.each_with_index do |loc, i|
         loc_prefix = "%s: " % (?A.ord + i).chr if option[:diff]
@@ -619,7 +619,7 @@ class Flay
 
     data = analyze only
 
-    if option[:report]
+    if option[:report] then
       report_json(io,data)
     else
       report_io(io,data)
