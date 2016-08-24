@@ -1,3 +1,9 @@
+=== 2.8.1 / 2016-08-24
+
+* 1 bug fix:
+
+  * Accidentally removed require from flay_task.rb. (ajacques)
+
 === 2.8.0 / 2016-05-16
 
 * 1 minor enhancement:
