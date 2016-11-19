@@ -27,13 +27,13 @@ class Flay
   end
 
   def self.run args = ARGV
-    extensions = ["rb"] + Flay.load_plugins
+    extensions = ["rb"] + load_plugins
     glob = "**/*.{#{extensions.join ","}}"
 
     expander = PathExpander.new args, glob
     files = expander.filter_files expander.process, DEFAULT_IGNORE
 
-    flay = Flay.new Flay.parse_options args
+    flay = new parse_options args
     flay.process(*files)
     flay
   end
@@ -63,7 +63,7 @@ class Flay
 
     OptionParser.new do |opts|
       opts.banner  = "flay [options] files_or_dirs"
-      opts.version = Flay::VERSION
+      opts.version = VERSION
 
       opts.separator ""
       opts.separator "Specific options:"
@@ -113,7 +113,7 @@ class Flay
         options[:timeout] = t.to_i
       end
 
-      extensions = ["rb"] + Flay.load_plugins
+      extensions = ["rb"] + load_plugins
 
       opts.separator ""
       opts.separator "Known extensions: #{extensions.join(", ")}"
@@ -170,7 +170,7 @@ class Flay
   # Create a new instance of Flay with +option+s.
 
   def initialize option = nil
-    @option = option || Flay.default_options
+    @option = option || self.class.default_options
     @hashes = Hash.new { |h,k| h[k] = [] }
 
     self.identical      = {}
