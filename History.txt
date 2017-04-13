@@ -13,7 +13,7 @@
 * 2 bug fixes:
 
   * Added dev deps and bundler plugin to make flavorjones happy. (flavorjones)
-  * Explictly require rake/tasklib in flay_task.rb. (jasonkarns)
+  * Explicitly require rake/tasklib in flay_task.rb. (jasonkarns)
 
 === 2.7.0 / 2016-01-21
 
@@ -84,7 +84,7 @@ is. In this case, it severely falls short. I'd jump to 4.0 if I could.
   * Added Sexp#+.
   * Added Sexp#code_index to specify where *code starts in some sexps.
   * Added Sexp#has_code?.
-  * Added Sexp#initalize_copy to propagate file/line/modified info.
+  * Added Sexp#initialize_copy to propagate file/line/modified info.
   * Added Sexp#modified, #modified=, and #modified?.
   * Added Sexp#split_at(n). (Something I've wanted in Array for ages).
   * Added Sexp#split_code.
