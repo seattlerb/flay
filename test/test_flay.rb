@@ -19,10 +19,7 @@ class TestSexp < Minitest::Test
   end
 
   def test_structural_hash
-    hash = s(:iter,
-             s(:call, s(:arglist, s(:lit))),
-             s(:lasgn),
-             s(:call, s(:arglist))).hash
+    hash = 3336573932
 
     assert_equal hash, @s.deep_clone.structural_hash
     assert_equal hash, @s.structural_hash
@@ -49,13 +46,13 @@ class TestSexp < Minitest::Test
           s(:call, s(:arglist)))
 
     expected = [
-                s[1]      .hash,
-                s[1][1]   .hash,
-                s[1][1][1].hash,
-                s[2]      .hash,
-                s[3]      .hash,
-                s[3][1]   .hash,
-               ].sort
+                s[1],
+                s[1][1],
+                s[1][1][1],
+                s[2],
+                s[3],
+                s[3][1],
+               ].map(&:structural_hash).sort
 
     assert_equal expected, @s.all_structural_subhashes.sort.uniq
 
@@ -101,7 +98,18 @@ class TestSexp < Minitest::Test
     end
   RUBY
 
+  def register_node_types
+    # Register these node types to remove warnings in test
+    capture_io do
+      [:a, :b, :c, :d, :e].each do |s|
+        Sexp::NODE_NAMES[s]
+      end
+    end
+  end
+
   def test_prune
+    register_node_types
+
     contained = s(:a, s(:b,s(:c)), s(:d,s(:e)))
     container = s(:d, contained)
 
@@ -138,6 +146,8 @@ class TestSexp < Minitest::Test
   end
 
   def test_prune_liberal
+    register_node_types
+
     contained = s(:a, s(:b,s(:c)), s(:d,s(:e)))
     container = s(:d, contained)
 
