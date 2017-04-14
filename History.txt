@@ -1,3 +1,9 @@
+=== 2.9.0 / 2017-04-13
+
+* 1 minor enhancement:
+
+  * Added Sexp#pure_ruby_hash from flay-persistent and switched structural_hash to it. Faster than ruby's #hash and stable.
+
 === 2.8.1 / 2016-08-24
 
 * 1 bug fix:
