@@ -7,6 +7,9 @@ require "tmpdir"
 $: << "../../sexp_processor/dev/lib"
 
 class TestSexp < Minitest::Test
+  OPTS = Flay.parse_options %w[--mass=1 -v]
+  DEF_OPTS = {:diff=>false, :mass=>16, :summary=>false, :verbose=>false, :number=>true, :timeout=>10, :liberal=>false, :fuzzy=>false, :only=>nil}
+
   def setup
     # a(1) { |c| d }
     @s = s(:iter,
@@ -209,7 +212,7 @@ class TestSexp < Minitest::Test
   end
 
   def test_report
-    flay = Flay.new Flay.parse_options %w[--mass=1 -v]
+    flay = Flay.new OPTS
 
     flay.process_sexp DOG_AND_CAT.deep_clone
     flay.analyze
@@ -232,7 +235,7 @@ class TestSexp < Minitest::Test
 
   def test_report_io
     out = StringIO.new
-    flay = Flay.new Flay.parse_options %w[--mass=1 -v]
+    flay = Flay.new OPTS
 
     flay.process_sexp DOG_AND_CAT.deep_clone
     flay.analyze
@@ -250,7 +253,7 @@ class TestSexp < Minitest::Test
   end
 
   def test_report_diff
-    flay = Flay.new Flay.parse_options %w[-d --mass=1 -v]
+    flay = Flay.new OPTS.merge(:diff => true)
 
     flay.process_sexp DOG_AND_CAT.deep_clone
     flay.analyze
@@ -287,7 +290,7 @@ class TestSexp < Minitest::Test
   end
 
   def test_report_diff_plugin_converter
-    flay = Flay.new Flay.parse_options %w[-d --mass=1 -v]
+    flay = Flay.new OPTS.merge(:diff => true)
 
     flay.process_sexp DOG_AND_CAT.deep_clone
     flay.analyze
@@ -416,8 +419,7 @@ class TestSexp < Minitest::Test
     dog_and_cat = ["##\n# I am a dog.\n\ndef x\n  return \"Hello\"\nend",
                    "##\n# I\n#\n# am\n# a\n# cat.\n\ndef y\n  return \"Hello\"\nend"]
 
-    opts = Flay.parse_options
-    flay = Flay.new opts
+    flay = Flay.new DEF_OPTS
 
     exp = <<-EOM.gsub(/\d+/, "N").gsub(/^ {6}/, "").chomp
          ##
