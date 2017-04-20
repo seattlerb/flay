@@ -26,6 +26,9 @@ Hoe.spec "flay" do
   dependency "minitest",       "~> 5.8.0", :dev
   dependency "ruby2ruby",      "~> 2.2.0", :dev
 
+  dependency "minitest",       "~> 5.8.0", :dev
+  dependency "ruby2ruby",      "~> 2.2.0", :dev
+
   self.flay_threshold = 250
 end
 
