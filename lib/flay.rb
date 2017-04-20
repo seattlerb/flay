@@ -478,7 +478,7 @@ class Flay
         io.puts "%8.2f: %s" % [score, file]
       end
 
-      return
+      exit self.total.zero? ? 0 : 1
     end
 
     data.each_with_index do |item, count|
@@ -509,6 +509,8 @@ class Flay
         io.puts n_way_diff(*sources)
       end
     end
+
+    exit self.total.zero? ? 0 : 1
   end
 
   def sexp_to_rb sexp
