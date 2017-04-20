@@ -235,8 +235,8 @@ class TestSexp < Minitest::Test
       Total score (lower is better) = 16
 
       1) Similar code found in :class (mass = 16)
-        (string):1
-        (string):6
+        (string):1..1
+        (string):6..1
     END
 
     assert_equal "", err
@@ -255,8 +255,8 @@ class TestSexp < Minitest::Test
       Total score (lower is better) = 16
 
       1) Similar code found in :class (mass = 16)
-        (string):1
-        (string):6
+        (string):1..1
+        (string):6..6
     END
 
     assert_equal exp, out.string.gsub(/\d+/, "N")
@@ -276,8 +276,8 @@ class TestSexp < Minitest::Test
       Total score (lower is better) = 16
 
       1) Similar code found in :class (mass = 16)
-        A: (string):1
-        B: (string):6
+        A: (string):1..1
+        B: (string):6..6
 
          ##
       A: # I am a dog.
@@ -318,8 +318,8 @@ class TestSexp < Minitest::Test
       Total score (lower is better) = 16
 
       1) Similar code found in :class (mass = 16)
-        A: (string):1
-        B: (string):6
+        A: (string):1..1
+        B: (string):6..6
 
       A: source code 1
       B: source code 6

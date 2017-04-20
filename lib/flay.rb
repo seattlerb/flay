@@ -22,7 +22,7 @@ class Flay
     alias identical? bonus
   end
 
-  class Location < Struct.new(:file, :line, :fuzzy)
+  class Location < Struct.new(:file, :line, :last_line, :fuzzy)
     alias fuzzy? fuzzy
   end
 
@@ -244,7 +244,8 @@ class Flay
 
       locs = nodes.sort_by { |x| [x.file, x.line] }.each_with_index.map { |x, i|
         extra = :fuzzy if x.modified?
-        Location[x.file, x.line, extra]
+        last_line = x.last.line rescue 999
+        Location[x.file, x.line, last_line, extra]
       }
 
       Item[hash, node.first, bonus, mass, locs]
@@ -493,7 +494,7 @@ class Flay
       item.locations.each_with_index do |loc, i|
         loc_prefix = "%s: " % (?A.ord + i).chr if option[:diff]
         extra = " (FUZZY)" if loc.fuzzy?
-        io.puts "  %s%s:%d%s" % [loc_prefix, loc.file, loc.line, extra]
+        io.puts "  %s%s:%d..%d%s" % [loc_prefix, loc.file, loc.line, loc.last_line, extra]
       end
 
       if option[:diff] then
