@@ -12,6 +12,7 @@ Hoe::add_include_dirs("../../sexp_processor/dev/lib",
 
 Hoe.plugin :seattlerb
 Hoe.plugin :isolate
+Hoe.plugin :rdoc
 Hoe.plugin :bundler
 
 Hoe.spec "flay" do
