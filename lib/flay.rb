@@ -328,17 +328,38 @@ class Flay
   end
 
   ##
+  # Given an array of sexp patterns (see sexp_processor), delete any
+  # buckets whose members match any of the patterns.
+
+  def filter *patterns
+    return if patterns.empty?
+
+    self.hashes.delete_if { |_, sexps|
+      sexps.any? { |sexp|
+        patterns.any? { |pattern|
+          pattern =~ sexp
+        }
+      }
+    }
+  end
+
+  ##
   # Prunes nodes that aren't relevant to analysis or are already
-  # covered by another node.
+  # covered by another node. Also deletes nodes based on the
+  # +:filters+ option.
 
   def prune
     # prune trees that aren't duped at all, or are too small
     self.hashes.delete_if { |_,nodes| nodes.size == 1 }
     self.hashes.delete_if { |_,nodes| nodes.all?(&:modified?) }
 
-    return prune_liberally if option[:liberal]
+    if option[:liberal] then
+      prune_liberally
+    else
+      prune_conservatively
+    end
 
-    prune_conservatively
+    self.filter(*option[:filters])
   end
 
   ##
