@@ -1,3 +1,9 @@
+=== 2.10.0 / 2017-07-17
+
+* 1 minor enhancement:
+
+  * Added sexp tree filtering via :filters option.
+
 === 2.9.0 / 2017-04-13
 
 * 1 minor enhancement:
