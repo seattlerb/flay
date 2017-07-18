@@ -52,6 +52,7 @@ class Flay
       :liberal => false,
       :fuzzy   => false,
       :only   => nil,
+      :ext     => nil,
     }
   end
 
@@ -111,6 +112,11 @@ class Flay
       opts.on("-t", "--timeout TIME", Integer,
               "Set the timeout. (default = #{options[:timeout]})") do |t|
         options[:timeout] = t.to_i
+      end
+
+      opts.on("-x", "--ext EXTENSION", String,
+              "Use specified file type, regardless of filename.") do |s|
+        options[:ext] = s
       end
 
       extensions = ["rb"] + Flay.load_plugins
@@ -186,8 +192,12 @@ class Flay
     files.each do |file|
       warn "Processing #{file}" if option[:verbose]
 
-      ext = File.extname(file).sub(/^\./, "")
-      ext = "rb" if ext.nil? || ext.empty?
+      if option[:ext] then
+        ext = option[:ext]
+      else
+        ext = File.extname(file).sub(/^\./, "")
+        ext = "rb" if ext.nil? || ext.empty?
+      end
       msg = "process_#{ext}"
 
       unless respond_to? msg then
