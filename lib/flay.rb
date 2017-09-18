@@ -6,6 +6,7 @@ require "sexp_processor"
 require "ruby_parser"
 require "path_expander"
 require "timeout"
+require "zlib"
 
 class File
   RUBY19 = "<3".respond_to? :encoding unless defined? RUBY19 # :nodoc:
@@ -632,26 +633,11 @@ class Sexp
 end
 
 class Sexp # straight from flay-persistent
-  names = %w(alias and arglist args array attrasgn attrset back_ref
-             begin block block_pass break call case cdecl class colon2
-             colon3 const cvar cvasgn cvdecl defined defn defs dot2
-             dot3 dregx dregx_once dstr dsym dxstr ensure evstr false
-             flip2 flip3 for gasgn gvar hash iasgn if iter ivar lasgn
-             lit lvar masgn match match2 match3 module next nil not
-             nth_ref op_asgn op_asgn1 op_asgn2 op_asgn_and op_asgn_or or
-             postexe redo resbody rescue retry return sclass self
-             splat str super svalue to_ary true undef until valias
-             when while xstr yield zsuper kwarg kwsplat safe_call)
+  NODE_NAMES = {}
 
-  ##
-  # All ruby_parser nodes in an index hash. Used by jenkins algorithm.
-
-  NODE_NAMES = Hash[names.each_with_index.map {|n, i| [n.to_sym, i] }]
-
-  NODE_NAMES.default_proc = lambda { |h, k|
-    $stderr.puts "ERROR: couldn't find node type #{k} in Sexp::NODE_NAMES."
-    h[k] = NODE_NAMES.size
-  }
+  Sexp::NODE_NAMES.default_proc = lambda do |hash, key|
+    hash[key] = Zlib.crc32(key.to_s)
+  end
 
   MAX_INT32 = 2 ** 32 - 1 # :nodoc:
 
