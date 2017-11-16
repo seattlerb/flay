@@ -448,4 +448,28 @@ class TestSexp < Minitest::Test
 
     assert_equal exp, flay.n_way_diff(*dog_and_cat).gsub(/^ {3}$/, "")
   end
+
+  def test_prune_and_filter_conflict
+    exp_foo = s(:program,
+      s(:filter_me,
+        s(:a, s(:b))
+      )
+    )
+
+    exp_bar = s(:program,
+      s(:filter_me,
+        s(:a, s(:b)),
+        s(:c)
+      )
+    )
+
+    filter = Sexp::Matcher.parse("(filter_me ___)")
+    options = Flay.default_options.merge(mass: 0, filters: [filter])
+    flay = Flay.new(options)
+    flay.process_sexp exp_foo
+    flay.process_sexp exp_bar
+    flay.analyze
+
+    assert flay.hashes.empty?, flay.hashes.inspect
+  end
 end
