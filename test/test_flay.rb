@@ -448,4 +448,157 @@ class TestSexp < Minitest::Test
 
     assert_equal exp, flay.n_way_diff(*dog_and_cat).gsub(/^ {3}$/, "")
   end
+
+  [:keep, :filter_me, :a, :b, :c].each do |name|
+    Sexp::NODE_NAMES[name] = Sexp::NODE_NAMES.size
+  end
+
+  def test_prune_and_filter_conflict_separate_trees
+    exp_foo = s(:begin,
+                s(:filter_me,
+                  s(:a, s(:b))))
+
+    exp_bar = s(:begin,
+                s(:filter_me,
+                  s(:a, s(:b)),
+                  s(:c)))
+
+    filter = Sexp::Matcher.parse("(filter_me ___)")
+    options = Flay.default_options.merge(mass: 0, filters: [filter])
+    flay = Flay.new(options)
+
+    flay.process_sexp exp_foo
+    flay.process_sexp exp_bar
+
+    flay.prune
+
+    assert_empty flay.hashes
+  end
+
+  def test_prune_and_filter_conflict_different_tree_shapes
+    exp_foo = s(:filter_me,
+                s(:a, s(:b)))
+
+    exp_bar = s(:filter_me,
+                s(:a, s(:b)),
+                s(:c))
+
+    filter = Sexp::Matcher.parse("(filter_me ___)")
+    options = Flay.default_options.merge(mass: 0, filters: [filter])
+    flay = Flay.new(options)
+
+    flay.process_sexp s(:begin,
+                        exp_foo,
+                        exp_bar)
+
+    assert_empty flay.hashes
+
+    flay.prune
+
+    assert_empty flay.hashes
+  end
+
+  def test_prune_and_filter_conflict_different_literals
+    exp_foo = s(:filter_me,
+                s(:a, s(:b, 1)))
+
+    exp_bar = s(:filter_me,
+                s(:a, s(:b, 2)))
+
+    filter = Sexp::Matcher.parse("(filter_me ___)")
+    options = Flay.default_options.merge(mass: 0, filters: [filter])
+    flay = Flay.new(options)
+
+    flay.process_sexp s(:begin,
+                        exp_foo,
+                        exp_bar)
+
+    assert_empty flay.hashes
+
+    flay.prune
+
+    assert_empty flay.hashes
+  end
+
+  def test_prune_and_filter_conflict_shape_and_literals
+    exp_foo = s(:filter_me,
+                s(:a, s(:b, 1)))
+
+    exp_bar = s(:filter_me,
+                s(:a, s(:b, 2)),
+                s(:c))
+
+    filter = Sexp::Matcher.parse("(filter_me ___)")
+    options = Flay.default_options.merge(mass: 0, filters: [filter])
+    flay = Flay.new(options)
+
+    flay.process_sexp s(:begin,
+                        exp_foo,
+                        exp_bar)
+
+    assert_empty flay.hashes
+
+    flay.prune
+
+    assert_empty flay.hashes
+  end
+
+  def test_prune_and_filter_conflict_must_keep_nonfiltered_trees
+    exp_foo = s(:filter_me,
+                s(:a, s(:b, 1)))
+
+    exp_bar = s(:filter_me,
+                s(:a, s(:b, 2)))
+
+    exp_baz = s(:begin,
+                s(:keep,
+                  s(:a, s(:b, 1))),
+                s(:keep,
+                  s(:a, s(:b, 2))))
+
+    filter = Sexp::Matcher.parse("(filter_me ___)")
+    options = Flay.default_options.merge(mass: 0, filters: [filter])
+    flay = Flay.new(options)
+
+    flay.process_sexp s(:begin,
+                        exp_baz,
+                        exp_foo,
+                        exp_bar)
+
+    refute_empty flay.hashes
+
+    flay.prune
+
+    refute_empty flay.hashes
+  end
+
+  def test_prune_and_filter_conflict_must_keep_nonfiltered_trees2
+    exp_foo = s(:filter_me,
+                s(:a, s(:b, 1)))
+
+    exp_bar = s(:filter_me,
+                s(:a, s(:b, 2)))
+
+    exp_baz = s(:begin,
+                s(:keep,
+                  s(:a, s(:b, 1))),
+                s(:keep,
+                  s(:a, s(:b, 2))))
+
+    filter = Sexp::Matcher.parse("(filter_me ___)")
+    options = Flay.default_options.merge(mass: 0, filters: [filter])
+    flay = Flay.new(options)
+
+    flay.process_sexp s(:begin,
+                        exp_foo,
+                        exp_bar,
+                        exp_baz)
+
+    refute_empty flay.hashes
+
+    flay.prune
+
+    refute_empty flay.hashes
+  end
+
 end

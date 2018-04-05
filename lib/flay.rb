@@ -52,6 +52,7 @@ class Flay
       :liberal => false,
       :fuzzy   => false,
       :only    => nil,
+      :filters => [],
     }
   end
 
@@ -283,8 +284,9 @@ class Flay
 
   def process_sexp pt
     pt.deep_each do |node|
-      next unless node.any? { |sub| Sexp === sub }
-      next if node.mass < self.mass_threshold
+      next :skip if node.none? { |sub| Sexp === sub }
+      next :skip if node.mass < self.mass_threshold
+      next :skip if option[:filters].any? { |pattern| pattern =~ node }
 
       self.hashes[node.structural_hash] << node
 
