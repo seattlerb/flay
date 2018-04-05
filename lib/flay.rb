@@ -17,7 +17,7 @@ class File
 end
 
 class Flay
-  VERSION = "2.10.0" # :nodoc:
+  VERSION = "2.11.0" # :nodoc:
 
   class Item < Struct.new(:structural_hash, :name, :bonus, :mass, :locations)
     alias identical? bonus
