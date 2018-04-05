@@ -287,7 +287,7 @@ class Flay
     pt.deep_each do |node|
       next :skip if node.none? { |sub| Sexp === sub }
       next :skip if node.mass < self.mass_threshold
-      next :skip if option[:filters].any? { |pattern| pattern =~ node }
+      next :skip if option[:filters].any? { |pattern| pattern.satisfy? node }
 
       self.hashes[node.structural_hash] << node
 

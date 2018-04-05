@@ -436,26 +436,36 @@ class TestSexp < Minitest::Test
     assert_equal exp, flay.n_way_diff(*dog_and_cat).gsub(/^ {3}$/, "")
   end
 
-  [:keep, :filter_me, :a, :b, :c].each do |name|
-    Sexp::NODE_NAMES[name] = Sexp::NODE_NAMES.size
+  attr_accessor :flay
+
+  def refute_nodes type
+    assert flay.hashes.values.flatten(1).none? { |s| s.sexp_type == type }, "Found #{type} nodes!"
+  end
+
+  def assert_nodes type
+    assert flay.hashes.values.flatten(1).any? { |s| s.sexp_type == type }, "Did not find #{type} nodes!"
   end
 
   def test_prune_and_filter_conflict_separate_trees
     exp_foo = s(:begin,
-                s(:filter_me,
-                  s(:a, s(:b))))
+                s(:begin,
+                  s(:filter_me,
+                    s(:a, s(:b)))))
 
     exp_bar = s(:begin,
-                s(:filter_me,
-                  s(:a, s(:b)),
-                  s(:c)))
+                s(:begin,
+                  s(:filter_me,
+                    s(:a, s(:b)),
+                    s(:c))))
 
     filter = Sexp::Matcher.parse("(filter_me ___)")
     options = Flay.default_options.merge(mass: 0, filters: [filter])
-    flay = Flay.new(options)
+    self.flay = Flay.new(options)
 
     flay.process_sexp exp_foo
     flay.process_sexp exp_bar
+
+    refute_nodes :filter_me
 
     flay.prune
 
@@ -472,13 +482,14 @@ class TestSexp < Minitest::Test
 
     filter = Sexp::Matcher.parse("(filter_me ___)")
     options = Flay.default_options.merge(mass: 0, filters: [filter])
-    flay = Flay.new(options)
+    self.flay = Flay.new(options)
 
     flay.process_sexp s(:begin,
-                        exp_foo,
-                        exp_bar)
+                        s(:begin,
+                          exp_foo,
+                          exp_bar))
 
-    assert_empty flay.hashes
+    refute_nodes :filter_me
 
     flay.prune
 
@@ -494,13 +505,14 @@ class TestSexp < Minitest::Test
 
     filter = Sexp::Matcher.parse("(filter_me ___)")
     options = Flay.default_options.merge(mass: 0, filters: [filter])
-    flay = Flay.new(options)
+    self.flay = Flay.new(options)
 
     flay.process_sexp s(:begin,
-                        exp_foo,
-                        exp_bar)
+                        s(:begin,
+                          exp_foo,
+                          exp_bar))
 
-    assert_empty flay.hashes
+    refute_nodes :filter_me
 
     flay.prune
 
@@ -517,13 +529,14 @@ class TestSexp < Minitest::Test
 
     filter = Sexp::Matcher.parse("(filter_me ___)")
     options = Flay.default_options.merge(mass: 0, filters: [filter])
-    flay = Flay.new(options)
+    self.flay = Flay.new(options)
 
     flay.process_sexp s(:begin,
-                        exp_foo,
-                        exp_bar)
+                        s(:begin,
+                          exp_foo,
+                          exp_bar))
 
-    assert_empty flay.hashes
+    refute_nodes :filter_me
 
     flay.prune
 
@@ -545,18 +558,22 @@ class TestSexp < Minitest::Test
 
     filter = Sexp::Matcher.parse("(filter_me ___)")
     options = Flay.default_options.merge(mass: 0, filters: [filter])
-    flay = Flay.new(options)
+    self.flay = Flay.new(options)
 
     flay.process_sexp s(:begin,
-                        exp_baz,
-                        exp_foo,
-                        exp_bar)
+                        s(:begin,
+                          exp_baz,
+                          exp_foo,
+                          exp_bar))
 
-    refute_empty flay.hashes
+    refute_nodes :filter_me
+    assert_nodes :keep
 
     flay.prune
 
     refute_empty flay.hashes
+    refute_nodes :filter_me
+    assert_nodes :keep
   end
 
   def test_prune_and_filter_conflict_must_keep_nonfiltered_trees2
@@ -574,18 +591,22 @@ class TestSexp < Minitest::Test
 
     filter = Sexp::Matcher.parse("(filter_me ___)")
     options = Flay.default_options.merge(mass: 0, filters: [filter])
-    flay = Flay.new(options)
+    self.flay = Flay.new(options)
 
     flay.process_sexp s(:begin,
-                        exp_foo,
-                        exp_bar,
-                        exp_baz)
+                        s(:begin,
+                          exp_foo,
+                          exp_bar,
+                          exp_baz))
 
-    refute_empty flay.hashes
+    refute_nodes :filter_me
+    assert_nodes :keep
 
     flay.prune
 
     refute_empty flay.hashes
+    refute_nodes :filter_me
+    assert_nodes :keep
   end
 
 end
