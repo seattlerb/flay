@@ -51,7 +51,7 @@ class Flay
       :timeout => 10,
       :liberal => false,
       :fuzzy   => false,
-      :only   => nil,
+      :only    => nil,
     }
   end
 
@@ -169,8 +169,8 @@ class Flay
   ##
   # Create a new instance of Flay with +option+s.
 
-  def initialize option = nil
-    @option = option || Flay.default_options
+  def initialize option = {}
+    @option = Flay.default_options.merge option
     @hashes = Hash.new { |h,k| h[k] = [] }
 
     self.identical      = {}
