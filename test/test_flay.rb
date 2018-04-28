@@ -450,13 +450,12 @@ class TestSexp < Minitest::Test
     exp_foo = s(:begin,
                 s(:begin,
                   s(:filter_me,
-                    s(:a, s(:b)))))
+                    s(:a, s(:b, s(:c, s(:d)))))))
 
     exp_bar = s(:begin,
                 s(:begin,
                   s(:filter_me,
-                    s(:a, s(:b)),
-                    s(:c))))
+                    s(:a, s(:b, s(:c, s(:d)))))))
 
     filter = Sexp::Matcher.parse("(filter_me ___)")
     options = Flay.default_options.merge(mass: 0, filters: [filter])
@@ -466,8 +465,6 @@ class TestSexp < Minitest::Test
     flay.process_sexp exp_bar
 
     refute_nodes :filter_me
-
-    flay.prune
 
     assert_empty flay.hashes
   end

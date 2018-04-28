@@ -281,13 +281,25 @@ class Flay
   end
 
   ##
+  # Before processing, filter any sexp's that match against filters
+  # specified in +option[:filters]+. This changes the sexp itself.
+
+  def filter_sexp exp
+    exp.delete_if { |sexp|
+      if Sexp === sexp then
+        del = option[:filters].any? { |pattern| pattern.satisfy? sexp }
+        del or (filter_sexp(sexp); false)
+      end
+    }
+  end
+
+  ##
   # Process a sexp +pt+.
 
   def process_sexp pt
-    pt.deep_each do |node|
+    filter_sexp(pt).deep_each do |node|
       next :skip if node.none? { |sub| Sexp === sub }
       next :skip if node.mass < self.mass_threshold
-      next :skip if option[:filters].any? { |pattern| pattern.satisfy? node }
 
       self.hashes[node.structural_hash] << node
 
@@ -331,22 +343,6 @@ class Flay
   end
 
   ##
-  # Given an array of sexp patterns (see sexp_processor), delete any
-  # buckets whose members match any of the patterns.
-
-  def filter *patterns
-    return if patterns.empty?
-
-    self.hashes.delete_if { |_, sexps|
-      sexps.any? { |sexp|
-        patterns.any? { |pattern|
-          pattern =~ sexp
-        }
-      }
-    }
-  end
-
-  ##
   # Prunes nodes that aren't relevant to analysis or are already
   # covered by another node. Also deletes nodes based on the
   # +:filters+ option.
@@ -361,8 +357,6 @@ class Flay
     else
       prune_conservatively
     end
-
-    self.filter(*option[:filters])
   end
 
   ##
