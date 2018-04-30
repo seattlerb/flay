@@ -1,3 +1,9 @@
+=== 2.12.0 / 2018-04-29
+
+* 1 minor enhancement:
+
+  * Switched node filtering to happen before processing to avoid subtrees getting processed. Thanks to codeclimate.com for funding this effort!
+
 === 2.11.0 / 2018-04-05
 
 * 2 minor enhancements:
