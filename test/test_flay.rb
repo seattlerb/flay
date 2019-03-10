@@ -196,7 +196,7 @@ class TestSexp < Minitest::Test
 
     flay.process_sexp ROUND.deep_clone
 
-    actual = flay.hashes.values.map { |sexps| sexps.map { |sexp| sexp.first } }
+    actual = flay.hashes.values.map { |sexps| sexps.map(&:sexp_type) }
 
     assert_equal expected, actual.sort_by { |a| a.inspect }
   end

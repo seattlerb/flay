@@ -228,10 +228,11 @@ class Flay
     update_masses
 
     sorted = masses.sort_by { |h,m|
+      exp = hashes[h].first
       [-m,
-       hashes[h].first.file,
-       hashes[h].first.line,
-       hashes[h].first.first.to_s]
+       exp.file,
+       exp.line,
+       exp.sexp_type.to_s]
     }
 
     sorted.map { |hash, mass|
@@ -249,7 +250,7 @@ class Flay
         Location[x.file, x.line, extra]
       }
 
-      Item[hash, node.first, bonus, mass, locs]
+      Item[hash, node.sexp_type, bonus, mass, locs]
     }.compact
   end
 
@@ -579,7 +580,10 @@ class Sexp
     s
   end
 
+  alias :[] :[] # needed for STRICT_SEXP
+
   def [] a # :nodoc:
+    # TODO: figure out a way to make this STRICT_SEXP happy
     s = super
     if Sexp === s then
       s.file = self.file
@@ -636,7 +640,7 @@ class Sexp # straight from flay-persistent
   def pure_ruby_hash # :nodoc: see above
     hash = 0
 
-    n = NODE_NAMES[first]
+    n = NODE_NAMES[sexp_type]
 
     raise "Bad lookup: #{first} in #{sexp.inspect}" unless n
 
