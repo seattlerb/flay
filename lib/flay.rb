@@ -1,20 +1,11 @@
 #!/usr/bin/env ruby -w
 
 require "optparse"
-require "rubygems"
 require "sexp_processor"
 require "ruby_parser"
 require "path_expander"
 require "timeout"
 require "zlib"
-
-class File
-  RUBY19 = "<3".respond_to? :encoding unless defined? RUBY19 # :nodoc:
-
-  class << self
-    alias :binread :read unless RUBY19
-  end
-end
 
 class Flay
   VERSION = "2.12.1" # :nodoc:
@@ -159,8 +150,8 @@ class Flay
       end
     end
     @@plugins
-  rescue
-    # ignore
+  rescue => e
+    warn "Error loading plugins: #{e}" if option[:verbose]
   end
 
   # :stopdoc:

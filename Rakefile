@@ -21,7 +21,7 @@ Hoe.spec "flay" do
 
   dependency "sexp_processor", "~> 4.0"
   dependency "ruby_parser",    "~> 3.0"
-  dependency "erubis",         "~> 2.7.0"
+  dependency "erubi",          "~> 1.10"
   dependency "path_expander",  "~> 1.0"
 
   dependency "minitest",       "~> 5.8.0", :dev
