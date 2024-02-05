@@ -8,7 +8,7 @@ require "timeout"
 require "zlib"
 
 class Flay
-  VERSION = "2.13.1" # :nodoc:
+  VERSION = "2.13.2" # :nodoc:
 
   class Item < Struct.new(:structural_hash, :name, :bonus, :mass, :locations)
     alias identical? bonus
