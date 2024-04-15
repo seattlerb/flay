@@ -26,7 +26,7 @@ class Flay
     files = expander.filter_files expander.process, DEFAULT_IGNORE
 
     flay = Flay.new Flay.parse_options args
-    flay.process(*files)
+    flay.process(*files.sort)
     flay
   end
 
@@ -484,7 +484,7 @@ class Flay
     if option[:summary] then
       io.puts
 
-      self.summary.sort_by { |_,v| -v }.each do |file, score|
+      self.summary.sort_by { |f,v| [-v, f] }.each do |file, score|
         io.puts "%8.2f: %s" % [score, file]
       end
 
