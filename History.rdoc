@@ -1,3 +1,10 @@
+=== 2.13.3 / 2024-05-21
+
+* 2 bug fixes:
+
+  * Add secondary sort of score & files on output. (njhammond)
+  * Sort input files to make tracking progress easier.
+
 === 2.13.2 / 2024-02-05
 
 * 1 bug fix:
