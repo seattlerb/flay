@@ -393,10 +393,12 @@ class TestSexp < Minitest::Test
   def test_collapse_and_label
     flay = Flay.new
 
-    a = %w(a b c).map { |s| s.group = "A"; s }
-    b = %w(d b f).map { |s| s.group = "B"; s }
+    a = %w(a b c).map(&:dup).map { |s| s.group = "A"; s }
+    b = %w(d b f).map(&:dup).map { |s| s.group = "B"; s }
 
-    exp = [["A: a", "B: d"], "   b", ["A: c", "B: f"]]
+    exp = [["A: a", "B: d"],
+           "   b",
+           ["A: c", "B: f"]]
 
     assert_equal exp, flay.collapse_and_label([a, b])
   end
@@ -404,8 +406,8 @@ class TestSexp < Minitest::Test
   def test_collapse_and_label_same
     flay = Flay.new
 
-    a = %w(a b c).map { |s| s.group = "A"; s }
-    b = %w(a b c).map { |s| s.group = "B"; s }
+    a = %w(a b c).map(&:dup).map { |s| s.group = "A"; s }
+    b = %w(a b c).map(&:dup).map { |s| s.group = "B"; s }
 
     exp = ["   a", "   b", "   c"]
 
