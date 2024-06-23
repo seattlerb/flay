@@ -445,7 +445,7 @@ class Flay
   end
 
   def collapse_and_label ary # :nodoc:
-    ary[0].zip(*ary[1..-1]).map { |lines|
+    ary.first.zip(*ary.drop(1)).map { |lines|
       if lines.uniq.size == 1 then
         "   #{lines.first}"
       else
