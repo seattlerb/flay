@@ -13,7 +13,8 @@ class Flay
     ruby = Erubi.new(erb).src
 
     begin
-      RubyParser.new.process(ruby, file)
+      parser = option[:parser].new
+      parser.process(ruby, file, option[:timeout])
     rescue => e
       warn ruby if option[:verbose]
       raise e

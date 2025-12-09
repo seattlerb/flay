@@ -64,7 +64,7 @@ class TestSexp < Minitest::Test
     assert_equal expected, x.sort.uniq
   end
 
-  DOG_AND_CAT = RubyParser.new.process <<-RUBY
+  DOG_AND_CAT = NotRubyParser.new.process <<~RUBY
     ##
     # I am a dog.
 
@@ -87,7 +87,7 @@ class TestSexp < Minitest::Test
     end
   RUBY
 
-  ROUND = RubyParser.new.process <<-RUBY
+  ROUND = NotRubyParser.new.process <<~RUBY
     def x(n)
       if n % 2 == 0
         return n

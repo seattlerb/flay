@@ -20,7 +20,7 @@ Hoe.spec "flay" do
   license "MIT"
 
   dependency "sexp_processor", "~> 4.0"
-  dependency "ruby_parser",    "~> 3.0"
+  dependency "prism",          "~> 1.5"
   dependency "erubi",          "~> 1.10"
   dependency "path_expander",  "~> 1.0"
 
