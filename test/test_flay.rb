@@ -8,7 +8,6 @@ $: << "../../sexp_processor/dev/lib"
 
 class TestSexp < Minitest::Test
   OPTS = Flay.parse_options %w[--mass=1 -v]
-  DEF_OPTS = {:diff=>false, :mass=>16, :summary=>false, :verbose=>false, :number=>true, :timeout=>10, :liberal=>false, :fuzzy=>false, :only=>nil}
 
   def setup
     # a(1) { |c| d }
@@ -106,7 +105,7 @@ class TestSexp < Minitest::Test
     flay.process_sexp s(:outer,contained)
     2.times { flay.process_sexp s(:outer,container) }
 
-    exp = eval <<-EOM # just to prevent emacs from reindenting it
+    exp = eval <<~EOM # just to prevent emacs from reindenting it
           [
            [      s(:a, s(:b, s(:c)), s(:d, s(:e))),
                   s(:a, s(:b, s(:c)), s(:d, s(:e))),
@@ -142,7 +141,7 @@ class TestSexp < Minitest::Test
     flay.process_sexp s(:outer,contained)
     2.times { flay.process_sexp s(:outer,container) }
 
-    exp = eval <<-EOM # just to prevent emacs from reindenting it
+    exp = eval <<~EOM # just to prevent emacs from reindenting it
           [
            [      s(:a, s(:b, s(:c)), s(:d, s(:e))),
                   s(:a, s(:b, s(:c)), s(:d, s(:e))),
@@ -218,7 +217,7 @@ class TestSexp < Minitest::Test
       flay.report
     end
 
-    exp = <<-END.gsub(/\d+/, "N").gsub(/^ {6}/, "")
+    exp = <<~END
       Total score (lower is better) = 16
 
       1) Similar code found in :class (mass = 16)
@@ -227,7 +226,7 @@ class TestSexp < Minitest::Test
     END
 
     assert_equal "", err
-    assert_equal exp, out.gsub(/\d+/, "N")
+    assert_equal exp.gsub(/\d+/, "N"), out.gsub(/\d+/, "N")
   end
 
   def test_report_io
@@ -238,7 +237,7 @@ class TestSexp < Minitest::Test
     flay.analyze
     flay.report out
 
-    exp = <<-END.gsub(/\d+/, "N").gsub(/^ {6}/, "")
+    exp = <<~END
       Total score (lower is better) = 16
 
       1) Similar code found in :class (mass = 16)
@@ -246,7 +245,7 @@ class TestSexp < Minitest::Test
         (string):6
     END
 
-    assert_equal exp, out.string.gsub(/\d+/, "N")
+    assert_equal exp.gsub(/\d+/, "N"), out.string.gsub(/\d+/, "N")
   end
 
   def test_report_diff
@@ -259,7 +258,7 @@ class TestSexp < Minitest::Test
       flay.report
     end
 
-    exp = <<-END.gsub(/\d+/, "N").gsub(/^ {6}/, "")
+    exp = <<~END.gsub(/_NL_/, "")
       Total score (lower is better) = 16
 
       1) Similar code found in :class (mass = 16)
@@ -272,7 +271,7 @@ class TestSexp < Minitest::Test
       B: # am
       B: # a
       B: # cat.
-
+         _NL_
       A: class Dog
       B: class Cat
       A:   def x
@@ -283,7 +282,7 @@ class TestSexp < Minitest::Test
     END
 
     assert_equal "", err
-    assert_equal exp, out.gsub(/\d+/, "N").gsub(/^ {3}$/, "")
+    assert_equal exp.gsub(/\d+/, "N"), out.gsub(/\d+/, "N")
   end
 
   def test_report_diff_plugin_converter
@@ -301,7 +300,7 @@ class TestSexp < Minitest::Test
 
     Flay.send(:remove_method, :sexp_to_)
 
-    exp = <<-END.gsub(/\d+/, "N").gsub(/^ {6}/, "")
+    exp = <<~END
       Total score (lower is better) = 16
 
       1) Similar code found in :class (mass = 16)
@@ -313,7 +312,7 @@ class TestSexp < Minitest::Test
     END
 
     assert_equal "", err
-    assert_equal exp, out.gsub(/\d+/, "N").gsub(/^ {3}$/, "")
+    assert_equal exp.gsub(/\d+/, "N"), out.gsub(/\d+/, "N")
   end
 
   def test_n_way_diff
@@ -322,7 +321,7 @@ class TestSexp < Minitest::Test
 
     flay = Flay.new
 
-    exp = <<-EOM.gsub(/\d+/, "N").gsub(/^ {6}/, "").chomp
+    exp = <<~EOM.chomp
          ##
       A: # I am a dog.
       B: # I
@@ -349,7 +348,7 @@ class TestSexp < Minitest::Test
 
     flay = Flay.new
 
-    exp = <<-EOM.gsub(/\d+/, "N").gsub(/^ {6}/, "").chomp
+    exp = <<~EOM.gsub(/\d+/, "N").chomp
       A: class Dog
       B: class Cat
       A:   def x
@@ -359,7 +358,7 @@ class TestSexp < Minitest::Test
          end
     EOM
 
-    assert_equal exp, flay.n_way_diff(*dog_and_cat).gsub(/^ {3}$/, "")
+    assert_equal exp, flay.n_way_diff(*dog_and_cat)
   end
 
   def test_split_and_group
@@ -418,9 +417,9 @@ class TestSexp < Minitest::Test
     dog_and_cat = ["##\n# I am a dog.\n\ndef x\n  return \"Hello\"\nend",
                    "##\n# I\n#\n# am\n# a\n# cat.\n\ndef y\n  return \"Hello\"\nend"]
 
-    flay = Flay.new DEF_OPTS
+    flay = Flay.new Flay.default_options
 
-    exp = <<-EOM.gsub(/\d+/, "N").gsub(/^ {6}/, "").chomp
+    exp = <<~EOM.gsub(/\d+/, "N").gsub(/_NL_/, "").chomp
          ##
       A: # I am a dog.
       B: # I
@@ -428,14 +427,14 @@ class TestSexp < Minitest::Test
       B: # am
       B: # a
       B: # cat.
-
+         _NL_
       A: def x
       B: def y
            return \"Hello\"
          end
     EOM
 
-    assert_equal exp, flay.n_way_diff(*dog_and_cat).gsub(/^ {3}$/, "")
+    assert_equal exp, flay.n_way_diff(*dog_and_cat)
   end
 
   attr_accessor :flay
