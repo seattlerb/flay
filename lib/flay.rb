@@ -58,7 +58,7 @@ class NotRubyParser < Prism::Translation::RubyParser # compatibility layer
 end
 
 class Flay
-  VERSION = "2.13.3" # :nodoc:
+  VERSION = "2.14.0" # :nodoc:
 
   class Item < Struct.new(:structural_hash, :name, :bonus, :mass, :locations)
     alias identical? bonus

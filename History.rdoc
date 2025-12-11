@@ -1,3 +1,10 @@
+=== 2.14.0 / 2025-12-11
+
+* 2 minor enhancements:
+
+  * Bumped path_expander to 2.0.0.
+  * Switched to prism for ruby parsing. Use --legacy for RubyParser.
+
 === 2.13.3 / 2024-05-21
 
 * 2 bug fixes:
