@@ -22,7 +22,7 @@ Hoe.spec "flay" do
   dependency "sexp_processor", "~> 4.0"
   dependency "prism",          "~> 1.5"
   dependency "erubi",          "~> 1.10"
-  dependency "path_expander",  "~> 1.0"
+  dependency "path_expander",  "~> 2.0"
 
   dependency "minitest",       "~> 5.8.0", :dev
   dependency "ruby2ruby",      "~> 2.2.0", :dev
