@@ -5,57 +5,10 @@ require "sexp_processor"
 require "path_expander"
 require "timeout"
 require "zlib"
-
 require "prism"
 require "prism/translation/ruby_parser"
 
-unless Prism::Translation::RubyParser.method_defined? :process then
-  module PrismCompilerMonkeyPatches
-    def attach_comments sexp, node
-      return unless node.comments
-      return if node.comments.empty?
-
-      extra = node.location.start_line - node.comments.last.location.start_line
-      comments = node.comments.map(&:slice)
-      comments.concat [nil] * extra
-      sexp.comments = comments.join "\n"
-    end
-
-    def visit_class_node(node)  = super.tap { |sexp| attach_comments sexp, node }
-    def visit_def_node(node)    = super.tap { |sexp| attach_comments sexp, node }
-    def visit_module_node(node) = super.tap { |sexp| attach_comments sexp, node }
-  end
-
-  module PrismRPMonkeyPatches
-    def process ruby, file="(string)", timeout=nil
-      Timeout.timeout timeout do
-        parse ruby, file
-      end
-    end
-
-    def translate(result, filepath)
-      result.attach_comments!
-      super
-    end
-  end
-
-  module Prism
-    module Translation
-      class RubyParser
-        prepend PrismRPMonkeyPatches
-
-        class Compiler
-          prepend PrismCompilerMonkeyPatches
-        end
-      end
-    end
-  end
-else
-  warn "Tell zenspider to remove prism monkeypatches: #{caller.first}"
-end
-
-class NotRubyParser < Prism::Translation::RubyParser # compatibility layer
-end
+NotRubyParser = Class.new Prism::Translation::RubyParser # compatibility layer
 
 class Flay
   VERSION = "2.14.0" # :nodoc:

@@ -4,7 +4,6 @@ require "rubygems"
 require "hoe"
 
 Hoe::add_include_dirs("../../sexp_processor/dev/lib",
-                      "../../ruby_parser/dev/lib",
                       "../../ruby2ruby/dev/lib",
                       "../../ZenTest/dev/lib",
                       "../../path_expander/dev/lib",
@@ -20,7 +19,7 @@ Hoe.spec "flay" do
   license "MIT"
 
   dependency "sexp_processor", "~> 4.0"
-  dependency "prism",          "~> 1.5"
+  dependency "prism",          "~> 1.7"
   dependency "erubi",          "~> 1.10"
   dependency "path_expander",  "~> 2.0"
 
