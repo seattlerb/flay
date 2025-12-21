@@ -4,8 +4,6 @@ require "minitest/autorun"
 require "flay"
 require "tmpdir"
 
-$: << "../../sexp_processor/dev/lib"
-
 class TestSexp < Minitest::Test
   OPTS = Flay.parse_options %w[--mass=1 -v]
 
