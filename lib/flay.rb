@@ -11,7 +11,7 @@ require "prism/translation/ruby_parser"
 NotRubyParser = Class.new Prism::Translation::RubyParser # compatibility layer
 
 class Flay
-  VERSION = "2.14.0" # :nodoc:
+  VERSION = "2.14.1" # :nodoc:
 
   class Item < Struct.new(:structural_hash, :name, :bonus, :mass, :locations)
     alias identical? bonus
