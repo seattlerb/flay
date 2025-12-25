@@ -10,7 +10,7 @@ Hoe::add_include_dirs("../../sexp_processor/dev/lib",
                       "lib")
 
 Hoe.plugin :seattlerb
-Hoe.plugin :isolate
+Hoe.plugin :isolate_binaries
 Hoe.plugin :rdoc
 Hoe.plugin :bundler
 
