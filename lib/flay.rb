@@ -8,10 +8,10 @@ require "zlib"
 require "prism"
 require "prism/translation/ruby_parser"
 
-NotRubyParser = Class.new Prism::Translation::RubyParser # compatibility layer
-
 class Flay
   VERSION = "2.14.1" # :nodoc:
+
+  NotRubyParser = Class.new Prism::Translation::RubyParser # compatibility layer :nodoc:
 
   class Item < Struct.new(:structural_hash, :name, :bonus, :mass, :locations)
     alias identical? bonus

@@ -62,6 +62,8 @@ class TestSexp < Minitest::Test
     assert_equal expected, x.sort.uniq
   end
 
+  NotRubyParser = Flay::NotRubyParser
+
   DOG_AND_CAT = NotRubyParser.new.process <<~RUBY
     ##
     # I am a dog.
