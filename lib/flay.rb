@@ -9,7 +9,7 @@ require "prism"
 require "prism/translation/ruby_parser"
 
 class Flay
-  VERSION = "2.14.1" # :nodoc:
+  VERSION = "2.14.2" # :nodoc:
 
   NotRubyParser = Class.new Prism::Translation::RubyParser # compatibility layer :nodoc:
 

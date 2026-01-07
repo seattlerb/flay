@@ -1,3 +1,9 @@
+=== 2.14.2 / 2026-01-06
+
+* 1 bug fix:
+
+  * Namespace NotRubyParser to avoid problems with bundler's horrid eager loading. (nateberkopec)
+
 === 2.14.1 / 2025-12-20
 
 * 3 bug fixes:
