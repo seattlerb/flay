@@ -8,6 +8,19 @@ require "zlib"
 require "prism"
 require "prism/translation/ruby_parser"
 
+class Prism::Translation::RubyParser
+  module TweakIt
+    def visit_it_local_variable_read_node(node) # TODO: upstream
+      s(node, :lvar, :it)
+    end
+
+    def visit_local_variable_read_node(node)
+      s(node, :lvar, node.name)
+    end
+  end
+  Compiler.prepend TweakIt
+end
+
 class Flay
   VERSION = "2.14.4" # :nodoc:
 
