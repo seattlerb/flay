@@ -22,7 +22,7 @@ class Prism::Translation::RubyParser
 end
 
 class Flay
-  VERSION = "2.14.4" # :nodoc:
+  VERSION = "2.15.0" # :nodoc:
 
   NotRubyParser = Class.new Prism::Translation::RubyParser # compatibility layer :nodoc:
 
@@ -281,18 +281,31 @@ class Flay
   end
 
   ##
+  # Parse +ruby+ source originating from +file+ and return the sexp.
+  #
+  # This is the shared parse for every plugin that turns a template into
+  # ruby -- erb, slim, haml. Plugins call this rather than instantiating a
+  # parser themselves, so they pick up option[:parser] and option[:timeout]
+  # instead of drifting away from them.
+
+  def parse_ruby ruby, file
+    parser = option[:parser].new
+    parser.process ruby, file, option[:timeout]
+  rescue Timeout::Error
+    warn "TIMEOUT parsing #{file}. Skipping."
+  rescue => e
+    warn ruby if option[:verbose]
+    raise e
+  end
+
+  ##
   # Parse a ruby +file+ and return the sexp.
   #
   # --
   # TODO: change the system and rename this to parse_rb.
 
   def process_rb file
-    begin
-      parser = option[:parser].new
-      parser.process(File.binread(file), file, option[:timeout])
-    rescue Timeout::Error
-      warn "TIMEOUT parsing #{file}. Skipping."
-    end
+    parse_ruby File.binread(file), file
   end
 
   ##

@@ -172,6 +172,28 @@ class TestSexp < Minitest::Test
     assert_equal exp, flay.hashes.values.sort_by(&:inspect)
   end
 
+  # blank lines on purpose: a text chunk carries its own newline, so a
+  # dense template keeps its line numbers even under stock Erubi. Only
+  # newline-only chunks go through Flay::Erubi's @newline_pending, so only
+  # a template with blank lines can tell the two apart. Stock Erubi puts
+  # the call below on line 2; the template says 4.
+  ERB_BLANK_LINES = "<% if user %>\n\n\n<%= user.name %>\n\n\n<% end %>\n"
+
+  def test_process_erb
+    Dir.mktmpdir do |dir|
+      path = File.join dir, "sample.erb"
+      File.write path, ERB_BLANK_LINES
+
+      sexp = Flay.new(OPTS).process_erb path
+
+      calls = sexp.deep_each.select { |s|
+        s.sexp_type == :call && s[2] == :name
+      }
+
+      assert_equal [4], calls.map(&:line)
+    end
+  end
+
   def test_process_sexp
     flay = Flay.new
 

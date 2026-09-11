@@ -1,3 +1,14 @@
+=== 2.15.0 / 2026-09-11
+
+* 1 major enhancement:
+
+  * Added Flay#parse_ruby, the shared parse for template plugins (erb, slim, haml).
+
+* 1 minor enhancement:
+
+  * process_rb and process_erb now share one parse, so plugins pick up
+    option[:parser] and option[:timeout] instead of drifting from them.
+
 === 2.14.4 / 2026-04-14
 
 * 2 bug fixes:

@@ -8,17 +8,7 @@ class Flay
   # ruby.
 
   def process_erb file
-    erb = File.read file
-
-    ruby = Erubi.new(erb).src
-
-    begin
-      parser = option[:parser].new
-      parser.process(ruby, file, option[:timeout])
-    rescue => e
-      warn ruby if option[:verbose]
-      raise e
-    end
+    parse_ruby Erubi.new(File.read file).src, file
   end
 
   # stolen (and munged) from lib/action_view/template/handlers/erb/erubi.rb
