@@ -86,9 +86,15 @@ braces vs do/end, etc are all ignored. Making this totally rad.
      end
   ...
 
+== AI Policy:
+
+AI is not allowed. Not in PRs, not in issues... just NO. See {my AI
+policy}[https://zenspider.com/ruby/2026/07/my-ai-policy.html] for more
+details. If it "smells of AI", it will be rejected.
+
 == REQUIREMENTS:
 
-* ruby_parser
+* prism (can still use ruby_parser with --legacy, but why??)
 * sexp_processor
 * path_expander
 * ruby2ruby -- soft dependency: only if you want to use --diff
