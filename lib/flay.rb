@@ -10,7 +10,8 @@ require "prism/translation/ruby_parser"
 
 class Prism::Translation::RubyParser
   module TweakIt
-    def visit_it_local_variable_read_node(node) # TODO: upstream
+    # TODO: remove after https://github.com/ruby/prism/pull/4360 merged
+    def visit_it_local_variable_read_node(node)
       s(node, :lvar, :it)
     end
 
