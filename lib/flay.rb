@@ -23,7 +23,7 @@ class Prism::Translation::RubyParser
 end
 
 class Flay
-  VERSION = "2.14.4" # :nodoc:
+  VERSION = "2.14.5" # :nodoc:
 
   NotRubyParser = Class.new Prism::Translation::RubyParser # compatibility layer :nodoc:
 

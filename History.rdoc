@@ -1,3 +1,10 @@
+=== 2.14.5 / 2026-11-11
+
+* 2 bug fixes:
+
+  * Fixed block lvar processing for it, _1, etc.
+  * Loosened prism dependency to include 2.x.
+
 === 2.14.4 / 2026-04-14
 
 * 2 bug fixes:
